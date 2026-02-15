@@ -1,0 +1,44 @@
+## [Visual Studio]
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+## [Visual Studio Code]
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+## [Build Artifacts]
+**/bin/
+**/obj/
+**/publish/
+*.dll
+*.exe
+*.pdb
+*.suo
+
+## [Configuration Files - SENSITIVE]
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/secret.json
+.env
+
+## [Logs]
+*.log
+logs/
+**/logs/
+
+## [OS Specific]
+.DS_Store
+Thumbs.db
+
+## [NuGet]
+**/packages/
+*.nupkg
+project.lock.json
+project.assets.json

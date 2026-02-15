@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ZtvvlRDvCiE=",
+  "dgSpecHash": "izeLsF9BFoY=",
   "success": true,
-  "projectFilePath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\authentication-service\\auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj",
+  "projectFilePath": "C:\\CrediExpress\\authentication-service\\auth-service\\src\\AuthService.Domain\\AuthService.Domain.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }

@@ -8,6 +8,6 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = AuthService.Domain
-build_property.ProjectDir = C:\CrediExpress\authentication-service\auth-service\src\AuthService.Domain\
+build_property.ProjectDir = C:\IN6AM\CrediExpress\CrediExpress\authentication-service\auth-service\src\AuthService.Domain\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 

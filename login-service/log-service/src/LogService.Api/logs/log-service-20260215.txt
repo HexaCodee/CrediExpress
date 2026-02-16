@@ -1,0 +1,227 @@
+[2026-02-15 18:04:11 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:04:15 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:04:15 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:04:15 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:05:32 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCTSCT3FC0:00000001","RequestPath":"/api/v1/health","ConnectionId":"0HNJCTSCT3FC0"}
+[2026-02-15 18:05:33 INF] HTTP GET /api/v1/health responded 200 in 1031.2715 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCTSCT3FC0:00000001","ConnectionId":"0HNJCTSCT3FC0"}
+[2026-02-15 18:07:06 INF] HTTP POST /api/v1/log/register/ responded 404 in 0.8969 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCTSCT3FC2:00000001","ConnectionId":"0HNJCTSCT3FC2"}
+[2026-02-15 18:08:53 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:08:54 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:08:54 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:08:54 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:09:26 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCTUIR1JPL:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCTUIR1JPL"}
+[2026-02-15 18:09:26 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCTUIR1JPL:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCTUIR1JPL"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.IAuthService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method24(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:09:26 INF] HTTP POST /api/v1/log/register/ responded 400 in 320.7607 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCTUIR1JPL:00000001","ConnectionId":"0HNJCTUIR1JPL"}
+[2026-02-15 18:27:30 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:27:31 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:27:31 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:27:31 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:27:37 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCU8NPINNR:00000001","RequestPath":"/api/v1/health","ConnectionId":"0HNJCU8NPINNR"}
+[2026-02-15 18:27:37 INF] HTTP GET /api/v1/health responded 200 in 71.9469 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCU8NPINNR:00000001","ConnectionId":"0HNJCU8NPINNR"}
+[2026-02-15 18:27:40 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCU8NPINNR:00000002","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCU8NPINNR"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.IAuthService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method26(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:27:40 INF] HTTP POST /api/v1/log/register/ responded 400 in 61.8673 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCU8NPINNR:00000002","ConnectionId":"0HNJCU8NPINNR"}
+[2026-02-15 18:27:43 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCU8NPINNR:00000003","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCU8NPINNR"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.IAuthService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method26(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:27:43 INF] HTTP POST /api/v1/log/register/ responded 400 in 10.8303 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCU8NPINNR:00000003","ConnectionId":"0HNJCU8NPINNR"}
+[2026-02-15 18:30:15 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:30:15 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:30:16 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:30:16 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:30:21 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCUA8O80SP:00000001","RequestPath":"/api/v1/health","ConnectionId":"0HNJCUA8O80SP"}
+[2026-02-15 18:30:21 INF] HTTP GET /api/v1/health responded 200 in 72.6012 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUA8O80SP:00000001","ConnectionId":"0HNJCUA8O80SP"}
+[2026-02-15 18:30:23 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCUA8O80SP:00000002","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUA8O80SP"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.ILogService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method26(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:30:23 INF] HTTP POST /api/v1/log/register/ responded 400 in 63.2822 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUA8O80SP:00000002","ConnectionId":"0HNJCUA8O80SP"}
+[2026-02-15 18:33:41 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:33:42 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:33:42 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:33:42 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:33:44 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCUC5E9NVK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUC5E9NVK"}
+[2026-02-15 18:33:44 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCUC5E9NVK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUC5E9NVK"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.ILogService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method24(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:33:45 INF] HTTP POST /api/v1/log/register/ responded 400 in 110.8961 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUC5E9NVK:00000001","ConnectionId":"0HNJCUC5E9NVK"}
+[2026-02-15 18:33:46 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCUC5E9NVK:00000002","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUC5E9NVK"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.ILogService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method24(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:33:46 INF] HTTP POST /api/v1/log/register/ responded 400 in 10.7984 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUC5E9NVK:00000002","ConnectionId":"0HNJCUC5E9NVK"}
+[2026-02-15 18:43:11 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:43:12 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:43:12 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:43:12 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:43:16 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCUHFMEFAA:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUHFMEFAA"}
+[2026-02-15 18:43:16 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCUHFMEFAA:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUHFMEFAA"}
+System.InvalidOperationException: Unable to resolve service for type 'LoginService.Application.Interfaces.ILogService' while attempting to activate 'LoginService.Api.Controllers.LogController'.
+   at Microsoft.Extensions.DependencyInjection.ActivatorUtilities.ThrowHelperUnableToResolveService(Type type, Type requiredBy)
+   at lambda_method24(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:43:16 INF] HTTP POST /api/v1/log/register/ responded 400 in 267.3510 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUHFMEFAA:00000001","ConnectionId":"0HNJCUHFMEFAA"}
+[2026-02-15 18:58:39 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 18:58:40 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 18:58:40 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 18:58:40 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 18:58:49 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCUQ5N1HJK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQ5N1HJK"}
+[2026-02-15 18:58:49 ERR] An unhandled exception occurred {"SourceContext":"LoginService.Api.Middlewares.GlobalExceptionMiddleware","RequestId":"0HNJCUQ5N1HJK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQ5N1HJK"}
+System.ArgumentException: Cloud name must be specified in Account!
+   at CloudinaryDotNet.ApiShared..ctor(Account account)
+   at CloudinaryDotNet.Api..ctor(Account account)
+   at CloudinaryDotNet.Cloudinary..ctor(Account account)
+   at LoginService.Application.Services.CloudinaryService..ctor(IConfiguration configuration) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Application\Services\CloudinaryService.cs:line 9
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeDirectByRefWithFewArgs(Object obj, Span`1 copyOfArgs, BindingFlags invokeAttr)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeConstructorInfo.Invoke(BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitConstructor(ConstructorCallSite constructorCallSite, RuntimeResolverContext context)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSiteMain(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitCache(ServiceCallSite callSite, RuntimeResolverContext context, ServiceProviderEngineScope serviceProviderEngine, RuntimeResolverLock lockType)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitScopeCache(ServiceCallSite callSite, RuntimeResolverContext context)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitConstructor(ConstructorCallSite constructorCallSite, RuntimeResolverContext context)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSiteMain(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitCache(ServiceCallSite callSite, RuntimeResolverContext context, ServiceProviderEngineScope serviceProviderEngine, RuntimeResolverLock lockType)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.VisitScopeCache(ServiceCallSite callSite, RuntimeResolverContext context)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteVisitor`2.VisitCallSite(ServiceCallSite callSite, TArgument argument)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteRuntimeResolver.Resolve(ServiceCallSite callSite, ServiceProviderEngineScope scope)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.DynamicServiceProviderEngine.<>c__DisplayClass2_0.<RealizeService>b__0(ServiceProviderEngineScope scope)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.GetService(ServiceIdentifier serviceIdentifier, ServiceProviderEngineScope serviceProviderEngineScope)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope.GetService(Type serviceType)
+   at lambda_method24(Closure, IServiceProvider, Object[])
+   at Microsoft.AspNetCore.Mvc.Controllers.ControllerFactoryProvider.<>c__DisplayClass6_0.<CreateControllerFactory>g__CreateController|0(ControllerContext controllerContext)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.RateLimiting.RateLimitingMiddleware.InvokeInternal(HttpContext context, EnableRateLimitingAttribute enableRateLimitingAttribute)
+   at LoginService.Api.Middlewares.GlobalExceptionMiddleware.InvokeAsync(HttpContext context) in C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Api\Middlewares\GlobalExceptionMiddleware.cs:line 18
+[2026-02-15 18:58:49 INF] HTTP POST /api/v1/log/register/ responded 400 in 385.7674 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUQ5N1HJK:00000001","ConnectionId":"0HNJCUQ5N1HJK"}
+[2026-02-15 19:00:03 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 19:00:04 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 19:00:04 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 19:00:04 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 19:00:08 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:10 INF] User jsolares-2024238kinalito registered successfully {"EventId":{"Id":1001,"Name":"LogUserRegistered"},"SourceContext":"LoginService.Application.Services.LogService","ActionId":"e0cb4809-96d8-41e5-919f-e2ebe5e2dd5d","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:10 INF] HTTP POST /api/v1/log/register/ responded 201 in 1557.1420 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUQTFMMGK:00000001","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:10 WRN] Validación de certificados SSL deshabilitada. Solo usar en desarrollo. {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"e0cb4809-96d8-41e5-919f-e2ebe5e2dd5d","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:15 INF] Email enviado exitosamente {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"e0cb4809-96d8-41e5-919f-e2ebe5e2dd5d","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:15 INF] Pipeline de email completado {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"e0cb4809-96d8-41e5-919f-e2ebe5e2dd5d","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:15 INF] Email processed {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"e0cb4809-96d8-41e5-919f-e2ebe5e2dd5d","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:00:15 INF] Email de verificación enviado {"SourceContext":"LoginService.Application.Services.LogService","ActionId":"e0cb4809-96d8-41e5-919f-e2ebe5e2dd5d","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCUQTFMMGK:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCUQTFMMGK"}
+[2026-02-15 19:03:06 INF] HTTP POST /api/v1/auth/verify-email responded 404 in 0.8919 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUQTFMMGM:00000001","ConnectionId":"0HNJCUQTFMMGM"}
+[2026-02-15 19:05:38 WRN] Validación de certificados SSL deshabilitada. Solo usar en desarrollo. {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"fc89ba84-3c45-4e3d-a523-fa61b0329955","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCUQTFMMGO:00000001","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCUQTFMMGO"}
+[2026-02-15 19:05:40 INF] Email enviado exitosamente {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"fc89ba84-3c45-4e3d-a523-fa61b0329955","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCUQTFMMGO:00000001","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCUQTFMMGO"}
+[2026-02-15 19:05:40 INF] Pipeline de email completado {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"fc89ba84-3c45-4e3d-a523-fa61b0329955","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCUQTFMMGO:00000001","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCUQTFMMGO"}
+[2026-02-15 19:05:40 INF] Email processed {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"fc89ba84-3c45-4e3d-a523-fa61b0329955","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCUQTFMMGO:00000001","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCUQTFMMGO"}
+[2026-02-15 19:05:40 INF] Email verified successfully for user jsolares-2024238kinalito {"SourceContext":"LoginService.Application.Services.LogService","ActionId":"fc89ba84-3c45-4e3d-a523-fa61b0329955","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCUQTFMMGO:00000001","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCUQTFMMGO"}
+[2026-02-15 19:05:40 INF] HTTP POST /api/v1/log/verify-email responded 200 in 2798.1063 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCUQTFMMGO:00000001","ConnectionId":"0HNJCUQTFMMGO"}
+[2026-02-15 19:38:07 INF] Verificando conexión a la base de datos... {"SourceContext":"Program"}
+[2026-02-15 19:38:07 INF] Base de datos lista. Ejecutando datos semilla... {"SourceContext":"Program"}
+[2026-02-15 19:38:07 INF] Inicialización de base de datos completada exitosamente {"SourceContext":"Program"}
+[2026-02-15 19:38:07 INF] API de LoginService está ejecutándose en http://localhost:5062. Endpoint de salud: http://localhost:5062/api/v1/health {"SourceContext":"Program"}
+[2026-02-15 19:38:37 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:37 INF] User jsolares-2024238kinalito registered successfully {"EventId":{"Id":1001,"Name":"LogUserRegistered"},"SourceContext":"LoginService.Application.Services.LogService","ActionId":"f5cc2268-387b-4b50-9665-6c5cd8ab2536","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:37 WRN] Validación de certificados SSL deshabilitada. Solo usar en desarrollo. {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"f5cc2268-387b-4b50-9665-6c5cd8ab2536","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:37 INF] HTTP POST /api/v1/log/register/ responded 201 in 756.9322 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCVGDD4N3L:00000001","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:39 INF] Email enviado exitosamente {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"f5cc2268-387b-4b50-9665-6c5cd8ab2536","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:39 INF] Pipeline de email completado {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"f5cc2268-387b-4b50-9665-6c5cd8ab2536","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:39 INF] Email processed {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"f5cc2268-387b-4b50-9665-6c5cd8ab2536","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:38:39 INF] Email de verificación enviado {"SourceContext":"LoginService.Application.Services.LogService","ActionId":"f5cc2268-387b-4b50-9665-6c5cd8ab2536","ActionName":"LoginService.Api.Controllers.LogController.Register (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000001","RequestPath":"/api/v1/log/register/","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:39:10 WRN] Validación de certificados SSL deshabilitada. Solo usar en desarrollo. {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"234e8686-ac36-4628-842b-f225affd5463","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000002","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:39:12 INF] Email enviado exitosamente {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"234e8686-ac36-4628-842b-f225affd5463","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000002","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:39:12 INF] Pipeline de email completado {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"234e8686-ac36-4628-842b-f225affd5463","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000002","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:39:12 INF] Email processed {"SourceContext":"LoginService.Application.Services.EmailService","ActionId":"234e8686-ac36-4628-842b-f225affd5463","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000002","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:39:12 INF] Email verified successfully for user jsolares-2024238kinalito {"SourceContext":"LoginService.Application.Services.LogService","ActionId":"234e8686-ac36-4628-842b-f225affd5463","ActionName":"LoginService.Api.Controllers.LogController.VerifyEmail (LogService.Api)","RequestId":"0HNJCVGDD4N3L:00000002","RequestPath":"/api/v1/log/verify-email","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:39:12 INF] HTTP POST /api/v1/log/verify-email responded 200 in 1419.9341 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCVGDD4N3L:00000002","ConnectionId":"0HNJCVGDD4N3L"}
+[2026-02-15 19:40:52 INF] User login succeeded {"EventId":{"Id":1002,"Name":"LogUserLoggedIn"},"SourceContext":"LoginService.Application.Services.LogService","ActionId":"1ee4b0a5-346c-49d0-b03d-73f5383fa75b","ActionName":"LoginService.Api.Controllers.LogController.LoginI (LogService.Api)","RequestId":"0HNJCVGDD4N3N:00000001","RequestPath":"/api/v1/log/login/","ConnectionId":"0HNJCVGDD4N3N"}
+[2026-02-15 19:40:52 INF] HTTP POST /api/v1/log/login/ responded 200 in 417.3330 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJCVGDD4N3N:00000001","ConnectionId":"0HNJCVGDD4N3N"}

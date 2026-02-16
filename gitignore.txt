@@ -22,9 +22,6 @@
 *.suo
 
 ## [Configuration Files - SENSITIVE]
-**/appsettings.json
-**/appsettings.Development.json
-**/appsettings.Production.json
 **/secret.json
 .env
 

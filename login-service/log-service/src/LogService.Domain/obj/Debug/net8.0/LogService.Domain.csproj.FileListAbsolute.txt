@@ -1,0 +1,15 @@
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\bin\Debug\net8.0\LogService.Domain.deps.json
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\bin\Debug\net8.0\LogService.Domain.runtimeconfig.json
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\bin\Debug\net8.0\LogService.Domain.dll
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\bin\Debug\net8.0\LogService.Domain.pdb
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.csproj.AssemblyReference.cache
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.AssemblyInfoInputs.cache
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.AssemblyInfo.cs
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.csproj.CoreCompileInputs.cache
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.sourcelink.json
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.dll
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\refint\LogService.Domain.dll
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.pdb
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\LogService.Domain.genruntimeconfig.cache
+C:\IN6AM\CrediExpress\CrediExpress\login-service\log-service\src\LogService.Domain\obj\Debug\net8.0\ref\LogService.Domain.dll

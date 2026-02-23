@@ -1,4 +1,4 @@
-namespace LoginService.Application.DTOs;
+namespace AuthService.Application.DTOs;
 
 public class RegisterResponseDto
 {

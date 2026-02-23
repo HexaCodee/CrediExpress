@@ -41,16 +41,10 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddRateLimitingPolicies();
 
-
-// Repositorios (Capa de Infraestructura/Persistencia)
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-
-// Servicios de Aplicación y Utilidades
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Add security services
 builder.Services.AddSecurityPolicies(builder.Configuration);

@@ -5,6 +5,7 @@ namespace AuthService.Application.Interfaces;
 
 public interface IAuthService
 {
+    Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto);
     Task<EmailResponseDto> VerifyEmailAsync(VerifyEmailDto verifyEmailDto);
     Task<EmailResponseDto> ResendVerificationEmailAsync(ResendVerificationDto resendDto);
     Task<EmailResponseDto> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);

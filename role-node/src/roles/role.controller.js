@@ -1,4 +1,4 @@
-import { createRoleRecord, getAllRolesInDB } from './role.service.js';
+import { createRoleRecord, deleteRoleInDB, getAllRolesInDB, updateRoleInDB } from './role.service.js';
 
 export const getRoles = async (req, res, next) => {
     try {
@@ -36,6 +36,13 @@ export const updateRole = async (req, res, next) => {
         const data = req.body;
         const role = await updateRoleInDB(id, data);
 
+        if (!role) {
+            return res.status(404).json({
+                success: false,
+                message: 'Rol no encontrado'
+            });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Rol actualizado correctamente',
@@ -49,7 +56,14 @@ export const updateRole = async (req, res, next) => {
 export const deleteRole = async (req, res, next) => {
     try {
         const { id } = req.params;
-        await deleteRoleInDB(id);
+        const role = await deleteRoleInDB(id);
+
+        if (!role) {
+            return res.status(404).json({
+                success: false,
+                message: 'Rol no encontrado'
+            });
+        }
 
         res.status(200).json({
             success: true,

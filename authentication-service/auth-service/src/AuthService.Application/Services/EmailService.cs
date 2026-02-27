@@ -12,7 +12,11 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
     public async Task SendEmailVerificationAsync(string email, string username, string token)
     {
         var subject = "Verifica tu dirección de correo electrónico";
-        var verificationUrl = $"{configuration["AppSettings:FrontendUrl"]}/verify-email?token={token}";
+        var authBaseUrl = configuration["AppSettings:AuthServiceUrl"]
+            ?? configuration["AppSettings:FrontendUrl"]
+            ?? string.Empty;
+        authBaseUrl = authBaseUrl.TrimEnd('/');
+        var verificationUrl = $"{authBaseUrl}/api/v1/auth/verify-email?token={token}";
 
         var body = $@"
 <h2>¡Bienvenido {username}!</h2>
@@ -32,7 +36,11 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
     public async Task SendPasswordResetAsync(string email, string username, string token)
     {
         var subject = "Restablece tu contraseña";
-        var resetUrl = $"{configuration["AppSettings:FrontendUrl"]}/reset-password?token={token}";
+        var authBaseUrl = configuration["AppSettings:AuthServiceUrl"]
+            ?? configuration["AppSettings:FrontendUrl"]
+            ?? string.Empty;
+        authBaseUrl = authBaseUrl.TrimEnd('/');
+        var resetUrl = $"{authBaseUrl}/api/v1/auth/reset-password?token={token}";
 
         var body = $@"
 <h2>Solicitud de Restablecimiento de Contraseña</h2>

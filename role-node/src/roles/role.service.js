@@ -4,7 +4,7 @@ export const getAllRolesInDB = async () => {
     try {
         return await Role.find({ status: true });
     } catch (err) {
-        throw new Error("Error al obtener roles de la base de datos");
+        throw new Error(`Error al obtener roles de la base de datos: ${err.message}`);
     }
 };
 

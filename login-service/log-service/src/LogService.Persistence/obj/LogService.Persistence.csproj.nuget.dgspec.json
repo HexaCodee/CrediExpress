@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj": {}
+    "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj": {}
   },
   "projects": {
-    "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj": {
+    "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj",
+        "projectUniqueName": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj",
         "projectName": "LogService.Application",
-        "projectPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj",
-        "packagesPath": "C:\\Users\\Joshua Solares\\.nuget\\packages\\",
-        "outputPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\obj\\",
+        "projectPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj",
+        "packagesPath": "C:\\Users\\Informatica\\.nuget\\packages\\",
+        "outputPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Joshua Solares\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Informatica\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -26,8 +26,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj": {
-                "projectPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj"
+              "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj": {
+                "projectPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj"
               }
             }
           }
@@ -104,17 +104,17 @@
         }
       }
     },
-    "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj": {
+    "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj",
+        "projectUniqueName": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj",
         "projectName": "LogService.Domain",
-        "projectPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj",
-        "packagesPath": "C:\\Users\\Joshua Solares\\.nuget\\packages\\",
-        "outputPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\obj\\",
+        "projectPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj",
+        "packagesPath": "C:\\Users\\Informatica\\.nuget\\packages\\",
+        "outputPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Joshua Solares\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Informatica\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -192,17 +192,17 @@
         }
       }
     },
-    "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj": {
+    "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj",
+        "projectUniqueName": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj",
         "projectName": "LogService.Persistence",
-        "projectPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj",
-        "packagesPath": "C:\\Users\\Joshua Solares\\.nuget\\packages\\",
-        "outputPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\obj\\",
+        "projectPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\LogService.Persistence.csproj",
+        "packagesPath": "C:\\Users\\Informatica\\.nuget\\packages\\",
+        "outputPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Persistence\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Joshua Solares\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Informatica\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -214,11 +214,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj": {
-                "projectPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj"
+              "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj": {
+                "projectPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Application\\LogService.Application.csproj"
               },
-              "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj": {
-                "projectPath": "C:\\IN6AM\\CrediExpress\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj"
+              "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj": {
+                "projectPath": "C:\\IN6AM\\CrediExpress\\login-service\\log-service\\src\\LogService.Domain\\LogService.Domain.csproj"
               }
             }
           }

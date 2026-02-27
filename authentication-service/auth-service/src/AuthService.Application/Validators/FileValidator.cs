@@ -1,11 +1,11 @@
-using LoginService.Application.Interfaces;
+using AuthService.Application.Interfaces;
 
-namespace LoginService.Application.Validators;
+namespace AuthService.Application.Validators;
 
 public static class FileValidator
 {
     private static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
-    private const int MaxFileSizeInBytes = 5 * 1024 * 1024; // 5MB
+    private const int MaxFileSizeInBytes = 5 * 1024 * 1024;
 
     public static (bool IsValid, string? ErrorMessage) ValidateImage(IFileData file)
     {
@@ -14,20 +14,17 @@ public static class FileValidator
             return (false, "File is required");
         }
 
-        // Validar tamaño
         if (file.Size > MaxFileSizeInBytes)
         {
             return (false, $"File size cannot exceed {MaxFileSizeInBytes / (1024 * 1024)}MB");
         }
 
-        // Validar extensión
         var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
         if (!AllowedImageExtensions.Contains(extension))
         {
             return (false, $"Only the following file types are allowed: {string.Join(", ", AllowedImageExtensions)}");
         }
 
-        // Validar content type
         var allowedContentTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/webp" };
         if (!allowedContentTypes.Contains(file.ContentType.ToLowerInvariant()))
         {
@@ -40,7 +37,7 @@ public static class FileValidator
     public static string GenerateSecureFileName(string originalFileName)
     {
         var extension = Path.GetExtension(originalFileName).ToLowerInvariant();
-        var uniqueId = Guid.NewGuid().ToString("N")[..12]; // 12 caracteres únicos
+        var uniqueId = Guid.NewGuid().ToString("N")[..12];
         return $"profile-{uniqueId}{extension}";
     }
 }

@@ -118,6 +118,22 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             entity.Property(e => e.UserId)
                 .HasMaxLength(16);
             entity.Property(e => e.Phone).HasMaxLength(8);
+            entity.Property(e => e.AccountNumber)
+                .IsRequired()
+                .HasMaxLength(20);
+            entity.Property(e => e.Dpi)
+                .IsRequired()
+                .HasMaxLength(13);
+            entity.Property(e => e.Address)
+                .IsRequired()
+                .HasMaxLength(200);
+            entity.Property(e => e.JobName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.MonthlyIncome)
+                .HasPrecision(18, 2);
+            entity.HasIndex(e => e.AccountNumber).IsUnique();
+            entity.HasIndex(e => e.Dpi).IsUnique();
             entity.HasOne(e => e.User)
                 .WithOne(up => up.UserProfile);
         });

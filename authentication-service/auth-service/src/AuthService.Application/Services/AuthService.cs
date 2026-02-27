@@ -8,6 +8,7 @@ using AuthService.Application.DTOs.Email;
 using AuthService.Application.Exceptions;
 using AuthService.Application.Extensions;
 using AuthService.Application.Validators;
+using System.Security.Cryptography;
 
 namespace AuthService.Application.Services;
 
@@ -24,6 +25,11 @@ public class AuthService(
 
     public async Task<RegisterResponseDto> RegisterAsync(RegisterDto registerDto)
     {
+        if (registerDto.MonthlyIncome < 100)
+        {
+            throw new BusinessException(ErrorCodes.MONTHLY_INCOME_BELOW_MINIMUM, "No se puede crear la cuenta: los ingresos mensuales deben ser como mínimo Q100");
+        }
+
         if (await userRepository.ExistsByEmailAsync(registerDto.Email))
         {
             logger.LogRegistrationWithExistingEmail();
@@ -34,6 +40,11 @@ public class AuthService(
         {
             logger.LogRegistrationWithExistingUsername();
             throw new BusinessException(ErrorCodes.USERNAME_ALREADY_EXISTS, "El nombre de usuario ya existe");
+        }
+
+        if (await userRepository.ExistsByDpiAsync(registerDto.Dpi))
+        {
+            throw new BusinessException(ErrorCodes.DPI_ALREADY_EXISTS, "El DPI ya existe");
         }
 
         string profilePicturePath;
@@ -70,6 +81,7 @@ public class AuthService(
         var userEmailId = UuidGenerator.GenerateUserId();
         var userRoleId = UuidGenerator.GenerateUserId();
         var UserPasswordResetId = UuidGenerator.GenerateUserId();
+        var accountNumber = await GenerateUniqueAccountNumberAsync();
 
         var defaultRole = await roleRepository.GetByNameAsync(RoleConstants.CLIENT);
         if (defaultRole == null)
@@ -91,7 +103,12 @@ public class AuthService(
                 Id = userProfileId,
                 UserId = userId,
                 ProfilePicture = profilePicturePath,
-                Phone = registerDto.Phone
+                Phone = registerDto.Phone,
+                AccountNumber = accountNumber,
+                Dpi = registerDto.Dpi,
+                Address = registerDto.Address,
+                JobName = registerDto.JobName,
+                MonthlyIncome = registerDto.MonthlyIncome
             },
             UserEmail = new UserEmail
             {
@@ -157,12 +174,40 @@ public class AuthService(
             Email = user.Email,
             ProfilePicture = _cloudinaryService.GetFullImageUrl(user.UserProfile?.ProfilePicture ?? string.Empty),
             Phone = user.UserProfile?.Phone ?? string.Empty,
+            AccountNumber = user.UserProfile?.AccountNumber ?? string.Empty,
+            Dpi = user.UserProfile?.Dpi ?? string.Empty,
+            Address = user.UserProfile?.Address ?? string.Empty,
+            JobName = user.UserProfile?.JobName ?? string.Empty,
+            MonthlyIncome = user.UserProfile?.MonthlyIncome ?? 0,
             Role = userRole,
             Status = user.Status,
             IsEmailVerified = user.UserEmail?.EmailVerified ?? false,
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt
         };
+    }
+
+    private async Task<string> GenerateUniqueAccountNumberAsync()
+    {
+        const int maxAttempts = 10;
+
+        for (var attempt = 0; attempt < maxAttempts; attempt++)
+        {
+            var accountNumber = GenerateAccountNumber();
+            var exists = await userRepository.ExistsByAccountNumberAsync(accountNumber);
+            if (!exists)
+            {
+                return accountNumber;
+            }
+        }
+
+        throw new InvalidOperationException("No fue posible generar un número de cuenta único");
+    }
+
+    private static string GenerateAccountNumber()
+    {
+        var value = RandomNumberGenerator.GetInt32(100000000, 1000000000);
+        return value.ToString();
     }
     public async Task<EmailResponseDto> VerifyEmailAsync(VerifyEmailDto verifyEmailDto)
     {

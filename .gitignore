@@ -24,6 +24,8 @@
 ## [Configuration Files - SENSITIVE]
 **/secret.json
 .env
+appsettings.json
+pg/
 
 ## [Logs]
 *.log

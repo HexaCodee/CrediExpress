@@ -1,5 +1,5 @@
-import dotnev from 'dotenv';
+import dotenv from 'dotenv';
 import { initServer } from "./configs/app.js";
 
-dotnev.config();
+dotenv.config();
 initServer();

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using LoginService.Application.Extensions;
 using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace LoginService.Application.Services;
 
@@ -14,12 +15,15 @@ public class LogService(
     IUserRepository userRepository,
     IPasswordHashService passwordHashService,
     IJwtTokenService jwtTokenService,
+    IEmailService emailService,
+    ITokenRevocationService tokenRevocationService,
     ICloudinaryService cloudinaryService,
     IConfiguration configuration,
     ILogger<LogService> logger) : ILogService
 {
     private readonly ICloudinaryService _cloudinaryService = cloudinaryService;
     private static readonly ConcurrentDictionary<string, AttemptState> AttemptTracker = new();
+    private static readonly ConcurrentDictionary<string, MfaChallengeState> MfaChallenges = new();
     private const int MaxFailedAttempts = 5;
     private const int LockoutMinutes = 15;
 
@@ -73,6 +77,51 @@ public class LogService(
         ResetAttemptState(loginKey);
         ResetAttemptState(userKey);
 
+        var mfaEnabled = bool.TryParse(configuration["MfaSettings:Enabled"], out var enabled) && enabled;
+        var mfaCodeLength = int.TryParse(configuration["MfaSettings:CodeLength"], out var codeLength) ? codeLength : 6;
+        var mfaExpiryMinutes = int.TryParse(configuration["MfaSettings:CodeExpiryMinutes"], out var expiryMins) ? expiryMins : 5;
+
+        if (mfaEnabled)
+        {
+            var userMfaKey = $"mfa:{user.Id}";
+
+            if (string.IsNullOrWhiteSpace(loginDto.MfaCode))
+            {
+                var code = GenerateNumericCode(mfaCodeLength);
+                var expiresAt = DateTime.UtcNow.AddMinutes(mfaExpiryMinutes);
+
+                MfaChallenges[userMfaKey] = new MfaChallengeState
+                {
+                    Code = code,
+                    ExpiresAtUtc = expiresAt
+                };
+
+                await emailService.SendMfaCodeAsync(user.Email, user.Username, code, mfaExpiryMinutes);
+
+                return new LogResponseDto
+                {
+                    Success = true,
+                    RequiresMfa = true,
+                    Message = "Se envió un código MFA a tu correo.",
+                    UserDetails = MapToUserDetailsDto(user),
+                    MfaExpiresAt = expiresAt
+                };
+            }
+
+            if (!MfaChallenges.TryGetValue(userMfaKey, out var mfaChallenge) || mfaChallenge.ExpiresAtUtc <= DateTime.UtcNow)
+            {
+                MfaChallenges.TryRemove(userMfaKey, out _);
+                throw new UnauthorizedAccessException("El código MFA expiró o no existe. Inicia sesión nuevamente.");
+            }
+
+            if (!string.Equals(mfaChallenge.Code, loginDto.MfaCode.Trim(), StringComparison.Ordinal))
+            {
+                throw new UnauthorizedAccessException("Código MFA inválido.");
+            }
+
+            MfaChallenges.TryRemove(userMfaKey, out _);
+        }
+
         logger.LogUserLoggedIn();
 
         var token = jwtTokenService.GenerateToken(user);
@@ -86,6 +135,17 @@ public class LogService(
             UserDetails = MapToUserDetailsDto(user),
             ExpiresAt = DateTime.UtcNow.AddMinutes(expiryMinutes)
         };
+    }
+
+    public Task LogoutAsync(string? jti, DateTime? expiresAtUtc)
+    {
+        if (string.IsNullOrWhiteSpace(jti))
+        {
+            throw new UnauthorizedAccessException("Token inválido: no contiene identificador (jti).");
+        }
+
+        tokenRevocationService.RevokeToken(jti, expiresAtUtc ?? DateTime.UtcNow.AddMinutes(60));
+        return Task.CompletedTask;
     }
 
     private UserDetailsDto MapToUserDetailsDto(User user)
@@ -148,10 +208,27 @@ public class LogService(
         AttemptTracker.TryRemove(key, out _);
     }
 
+    private static string GenerateNumericCode(int length)
+    {
+        var digits = new char[length];
+        for (var index = 0; index < length; index++)
+        {
+            digits[index] = (char)('0' + RandomNumberGenerator.GetInt32(0, 10));
+        }
+
+        return new string(digits);
+    }
+
     private class AttemptState
     {
         public int FailedAttempts { get; set; }
         public DateTime? LockedUntilUtc { get; set; }
+    }
+
+    private class MfaChallengeState
+    {
+        public string Code { get; set; } = string.Empty;
+        public DateTime ExpiresAtUtc { get; set; }
     }
 }
 

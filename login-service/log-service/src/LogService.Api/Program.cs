@@ -44,6 +44,8 @@ builder.Services.AddRateLimitingPolicies();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<ITokenRevocationService, TokenRevocationService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 // Add security services

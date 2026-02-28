@@ -13,4 +13,7 @@ public class LoginDto
     [MinLength(8)]
     [MaxLength(128)]
     public string Password { get; set; } = string.Empty;
+
+    [MaxLength(12)]
+    public string? MfaCode { get; set; }
 }

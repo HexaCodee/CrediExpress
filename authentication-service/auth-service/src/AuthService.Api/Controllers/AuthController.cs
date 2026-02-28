@@ -2,23 +2,148 @@ using System;
 using AuthService.Application.DTOs;
 using AuthService.Application.DTOs.Email;
 using AuthService.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.VisualBasic;
 
 namespace AuthService.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService, IUserManagementService userManagementService) : ControllerBase
 {
+    private bool IsAdminRequest()
+    {
+        var role = User.FindFirst("role")?.Value;
+        return string.Equals(role, "BANK_ADMIN", StringComparison.OrdinalIgnoreCase);
+    }
+
     [HttpPost("register")]
+    [Authorize]
     [RequestSizeLimit(10 * 1024 * 1024)]
     [EnableRateLimiting("AuthPolicy")]
     public async Task<ActionResult<RegisterResponseDto>> Register([FromForm] RegisterDto registerDto)
     {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
         var result = await authService.RegisterAsync(registerDto);
         return StatusCode(201, result);
+    }
+
+    [HttpPost("admin/register-client")]
+    [Authorize]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    [EnableRateLimiting("AuthPolicy")]
+    public async Task<ActionResult<RegisterResponseDto>> RegisterClientByAdmin([FromForm] RegisterDto registerDto)
+    {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
+        var result = await authService.RegisterAsync(registerDto);
+        return StatusCode(201, result);
+    }
+
+    [HttpPost("admin/register-admin")]
+    [Authorize]
+    [RequestSizeLimit(10 * 1024 * 1024)]
+    [EnableRateLimiting("AuthPolicy")]
+    public async Task<ActionResult<RegisterResponseDto>> RegisterAdminByAdmin([FromForm] RegisterDto registerDto)
+    {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
+        var registerResponse = await authService.RegisterAsync(registerDto);
+        await userManagementService.UpdateUserRoleAsync(registerResponse.User.Id, "BANK_ADMIN");
+        registerResponse.User.Role = "BANK_ADMIN";
+
+        return StatusCode(201, registerResponse);
+    }
+
+    [HttpGet("admin/users")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<IReadOnlyList<UserResponseDto>>> GetManageableUsers()
+    {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
+        var requesterUserId = User.FindFirst("sub")?.Value;
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return Unauthorized();
+        }
+
+        var users = await userManagementService.GetManageableUsersAsync(requesterUserId);
+        return Ok(users);
+    }
+
+    [HttpGet("admin/users/{userId}")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<UserResponseDto>> GetManageableUserById([FromRoute] string userId)
+    {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
+        var requesterUserId = User.FindFirst("sub")?.Value;
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await userManagementService.GetManageableUserByIdAsync(requesterUserId, userId);
+        return Ok(user);
+    }
+
+    [HttpPut("admin/users/{userId}")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<UserResponseDto>> UpdateUserByAdmin([FromRoute] string userId, [FromBody] UpdateUserByAdminDto updateDto)
+    {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
+        var requesterUserId = User.FindFirst("sub")?.Value;
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return Unauthorized();
+        }
+
+        var user = await userManagementService.UpdateUserByAdminAsync(requesterUserId, userId, updateDto);
+        return Ok(user);
+    }
+
+    [HttpDelete("admin/users/{userId}")]
+    [Authorize]
+    [EnableRateLimiting("ApiPolicy")]
+    public async Task<ActionResult<object>> DeleteUserByAdmin([FromRoute] string userId)
+    {
+        if (!IsAdminRequest())
+        {
+            return Forbid();
+        }
+
+        var requesterUserId = User.FindFirst("sub")?.Value;
+        if (string.IsNullOrWhiteSpace(requesterUserId))
+        {
+            return Unauthorized();
+        }
+
+        await userManagementService.DeleteUserByAdminAsync(requesterUserId, userId);
+        return Ok(new { success = true, message = "Usuario eliminado" });
     }
 
     [HttpPost("verify-email")]

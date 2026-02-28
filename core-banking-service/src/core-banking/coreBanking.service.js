@@ -5,12 +5,59 @@ import Transaction from './transaction.model.js';
 const MAX_TRANSFER_PER_TX = 2000;
 const MAX_TRANSFER_DAILY = 10000;
 const DEPOSIT_REVERSAL_WINDOW_MINUTES = 1;
+const CONVERSION_SERVICE_URL = process.env.CONVERSION_SERVICE_URL || 'http://localhost:3009/crediExpress/v1';
+const CONVERSION_TIMEOUT_MS = Number(process.env.CONVERSION_TIMEOUT_MS || 8000);
 
 const buildReference = (prefix = 'TX') => `${prefix}-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
 const startOfDay = () => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+};
+
+const quoteConversion = async ({ fromCurrency, toCurrency, amount }) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), CONVERSION_TIMEOUT_MS);
+
+    try {
+        const params = new URLSearchParams({
+            from: fromCurrency,
+            to: toCurrency,
+            amount: String(amount),
+        });
+
+        const response = await fetch(`${CONVERSION_SERVICE_URL}/conversions/quote?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+            },
+            signal: controller.signal,
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.success || !payload?.quote) {
+            const error = new Error(payload?.message || 'No fue posible obtener la tasa de conversión');
+            error.statusCode = response.status || 502;
+            throw error;
+        }
+
+        return payload.quote;
+    } catch (err) {
+        if (err.name === 'AbortError') {
+            const timeoutError = new Error('Tiempo de espera agotado al consultar el servicio de conversión de divisas');
+            timeoutError.statusCode = 504;
+            throw timeoutError;
+        }
+
+        if (!err.statusCode) {
+            err.statusCode = 502;
+        }
+
+        throw err;
+    } finally {
+        clearTimeout(timeoutId);
+    }
 };
 
 export const registerOperationalAccountInDB = async (data) => {
@@ -199,12 +246,31 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
         throw error;
     }
 
+    let creditAmount = amount;
+    let conversionDetails = null;
+
+    if (fromAccount.currency !== toAccount.currency) {
+        conversionDetails = await quoteConversion({
+            fromCurrency: fromAccount.currency,
+            toCurrency: toAccount.currency,
+            amount,
+        });
+
+        creditAmount = Number(conversionDetails.convertedAmount);
+
+        if (!Number.isFinite(creditAmount) || creditAmount <= 0) {
+            const error = new Error('La conversión de divisas devolvió un monto inválido');
+            error.statusCode = 502;
+            throw error;
+        }
+    }
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
         fromAccount.balance -= amount;
-        toAccount.balance += amount;
+        toAccount.balance += creditAmount;
 
         await fromAccount.save({ session });
         await toAccount.save({ session });
@@ -220,7 +286,9 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
                 counterpartyAccountNumber: toAccountNumber,
                 amount,
                 currency: fromAccount.currency,
-                description: description || 'Transferencia enviada',
+                description: conversionDetails
+                    ? `${description || 'Transferencia enviada'} | Conversión ${fromAccount.currency}->${toAccount.currency} tasa ${conversionDetails.exchangeRate} comisión ${conversionDetails.commissionPercent}%`
+                    : (description || 'Transferencia enviada'),
                 createdByUserId: createdByUserId || null,
             }
         ], { session });
@@ -232,9 +300,11 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
                 status: 'APPLIED',
                 accountNumber: toAccountNumber,
                 counterpartyAccountNumber: fromAccountNumber,
-                amount,
+                amount: creditAmount,
                 currency: toAccount.currency,
-                description: description || 'Transferencia recibida',
+                description: conversionDetails
+                    ? `${description || 'Transferencia recibida'} | Neto acreditado tras conversión y comisión`
+                    : (description || 'Transferencia recibida'),
                 createdByUserId: createdByUserId || null,
             }
         ], { session });
@@ -246,6 +316,7 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
             referenceId,
             fromAccount,
             toAccount,
+            conversion: conversionDetails,
             debitTransaction: debitTx,
             creditTransaction: creditTx,
         };

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import CoreAccount from './coreAccount.model.js';
 import Transaction from './transaction.model.js';
+import FavoriteAccount from './favoriteAccount.model.js';
 
 const MAX_TRANSFER_PER_TX = 2000;
 const MAX_TRANSFER_DAILY = 10000;
@@ -325,6 +326,83 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
         session.endSession();
         throw err;
     }
+};
+
+export const createFavoriteAccountInDB = async ({ ownerUserId, accountNumber, accountType, alias }) => {
+    const destinationAccount = await CoreAccount.findOne({ accountNumber });
+    if (!destinationAccount) {
+        const error = new Error('La cuenta favorita no existe en core banking');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const normalizedAlias = String(alias || '').trim();
+    if (!normalizedAlias) {
+        const error = new Error('El alias es obligatorio');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const favorite = await FavoriteAccount.create({
+        ownerUserId,
+        accountNumber,
+        accountType: String(accountType || '').trim(),
+        alias: normalizedAlias,
+    });
+
+    return favorite;
+};
+
+export const listFavoriteAccountsInDB = async (ownerUserId) => {
+    return await FavoriteAccount.find({ ownerUserId }).sort({ createdAt: -1 });
+};
+
+export const updateFavoriteAccountInDB = async ({ favoriteId, ownerUserId, alias, accountType }) => {
+    const favorite = await FavoriteAccount.findOne({ _id: favoriteId, ownerUserId });
+    if (!favorite) {
+        const error = new Error('Favorito no encontrado');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    if (typeof alias === 'string' && alias.trim()) {
+        favorite.alias = alias.trim();
+    }
+
+    if (typeof accountType === 'string' && accountType.trim()) {
+        favorite.accountType = accountType.trim();
+    }
+
+    await favorite.save();
+    return favorite;
+};
+
+export const deleteFavoriteAccountInDB = async ({ favoriteId, ownerUserId }) => {
+    const deleted = await FavoriteAccount.findOneAndDelete({ _id: favoriteId, ownerUserId });
+    if (!deleted) {
+        const error = new Error('Favorito no encontrado');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return deleted;
+};
+
+export const quickTransferByFavoriteInDB = async ({ favoriteId, ownerUserId, fromAccountNumber, amount, description, createdByUserId }) => {
+    const favorite = await FavoriteAccount.findOne({ _id: favoriteId, ownerUserId });
+    if (!favorite) {
+        const error = new Error('Favorito no encontrado');
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return await transferInDB({
+        fromAccountNumber,
+        toAccountNumber: favorite.accountNumber,
+        amount,
+        description: description || `Transferencia rápida a ${favorite.alias}`,
+        createdByUserId,
+    });
 };
 
 export const getHistoryByAccountInDB = async (accountNumber, limit = 50) => {

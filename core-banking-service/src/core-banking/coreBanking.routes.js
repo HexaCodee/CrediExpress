@@ -2,8 +2,11 @@ import { Router } from 'express';
 import { check } from 'express-validator';
 import {
     createDeposit,
+    createFavoriteAccount,
+    createQuickTransferFromFavorite,
     createTransfer,
     getAccountOverview,
+    getFavoriteAccounts,
     getHistoryByAccount,
     getOperationalAccount,
     getOperationalAccounts,
@@ -11,7 +14,9 @@ import {
     getTopAccountsByMovements,
     getTransferUsageToday,
     registerOperationalAccount,
+    removeFavoriteAccount,
     reverseDeposit,
+    updateFavoriteAccount,
     updateDepositAmount,
 } from './coreBanking.controller.js';
 import { validateJWT } from '../../middlewares/validate-jwt.js';
@@ -71,6 +76,41 @@ router.post('/transfers', [
     check('description', 'description debe tener máximo 250 caracteres').optional().isLength({ max: 250 }),
     checkValidators,
 ], createTransfer);
+
+router.post('/transfers/favorites/:favoriteId', [
+    validateJWT,
+    check('favoriteId', 'favoriteId inválido').isMongoId(),
+    check('fromAccountNumber', 'fromAccountNumber inválido').isLength({ min: 8, max: 20 }),
+    check('amount', 'amount debe ser numérico y > 0').isFloat({ min: 0.01 }),
+    check('description', 'description debe tener máximo 250 caracteres').optional().isLength({ max: 250 }),
+    checkValidators,
+], createQuickTransferFromFavorite);
+
+router.get('/favorites', [
+    validateJWT,
+], getFavoriteAccounts);
+
+router.post('/favorites', [
+    validateJWT,
+    check('accountNumber', 'accountNumber inválido').isLength({ min: 8, max: 20 }),
+    check('accountType', 'accountType es obligatorio').not().isEmpty().isLength({ min: 2, max: 40 }),
+    check('alias', 'alias es obligatorio').not().isEmpty().isLength({ min: 2, max: 60 }),
+    checkValidators,
+], createFavoriteAccount);
+
+router.patch('/favorites/:favoriteId', [
+    validateJWT,
+    check('favoriteId', 'favoriteId inválido').isMongoId(),
+    check('accountType', 'accountType inválido').optional().isLength({ min: 2, max: 40 }),
+    check('alias', 'alias inválido').optional().isLength({ min: 2, max: 60 }),
+    checkValidators,
+], updateFavoriteAccount);
+
+router.delete('/favorites/:favoriteId', [
+    validateJWT,
+    check('favoriteId', 'favoriteId inválido').isMongoId(),
+    checkValidators,
+], removeFavoriteAccount);
 
 router.get('/history/account/:accountNumber', [
     validateJWT,

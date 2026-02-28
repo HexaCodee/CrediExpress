@@ -65,6 +65,22 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
         await SendEmailAsync(email, subject, body);
     }
 
+    public async Task SendMfaCodeAsync(string email, string username, string code, int expiresInMinutes)
+    {
+        var subject = "Código de verificación MFA";
+
+        var body = $@"
+<h2>Verificación de inicio de sesión</h2>
+<p>Hola {username},</p>
+<p>Tu código de verificación es:</p>
+<p style='font-size: 24px; font-weight: bold; letter-spacing: 4px;'>{code}</p>
+<p>Este código expira en {expiresInMinutes} minutos.</p>
+<p>Si no solicitaste este inicio de sesión, cambia tu contraseña inmediatamente.</p>
+        ";
+
+        await SendEmailAsync(email, subject, body);
+    }
+
     private async Task SendEmailAsync(string to, string subject, string body)
     {
         var smtpSettings = configuration.GetSection("SmtpSettings");

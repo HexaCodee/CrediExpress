@@ -1,16 +1,21 @@
 import {
     adjustDepositAmountInDB,
     applyDepositInDB,
+    createFavoriteAccountInDB,
+    deleteFavoriteAccountInDB,
     getAccountOverviewInDB,
     getAllOperationalAccountsInDB,
+    listFavoriteAccountsInDB,
     getHistoryByAccountInDB,
     getOperationalAccountInDB,
     getRecentMovementsByAccountInDB,
     getTopAccountsByMovementsInDB,
     getTransferUsageTodayInDB,
+    quickTransferByFavoriteInDB,
     registerOperationalAccountInDB,
     revertDepositInDB,
     transferInDB,
+    updateFavoriteAccountInDB,
 } from './coreBanking.service.js';
 
 export const registerOperationalAccount = async (req, res, next) => {
@@ -114,6 +119,92 @@ export const createTransfer = async (req, res, next) => {
         return res.status(201).json({
             success: true,
             message: 'Transferencia aplicada exitosamente',
+            result,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const createFavoriteAccount = async (req, res, next) => {
+    try {
+        const favorite = await createFavoriteAccountInDB({
+            ownerUserId: req.user?.id,
+            accountNumber: req.body.accountNumber,
+            accountType: req.body.accountType,
+            alias: req.body.alias,
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: 'Cuenta agregada a favoritos',
+            favorite,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const getFavoriteAccounts = async (req, res, next) => {
+    try {
+        const favorites = await listFavoriteAccountsInDB(req.user?.id);
+        return res.status(200).json({ success: true, total: favorites.length, favorites });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const updateFavoriteAccount = async (req, res, next) => {
+    try {
+        const { favoriteId } = req.params;
+        const favorite = await updateFavoriteAccountInDB({
+            favoriteId,
+            ownerUserId: req.user?.id,
+            alias: req.body.alias,
+            accountType: req.body.accountType,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Favorito actualizado',
+            favorite,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const removeFavoriteAccount = async (req, res, next) => {
+    try {
+        const { favoriteId } = req.params;
+        await deleteFavoriteAccountInDB({ favoriteId, ownerUserId: req.user?.id });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Favorito eliminado',
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+export const createQuickTransferFromFavorite = async (req, res, next) => {
+    try {
+        const { favoriteId } = req.params;
+        const { fromAccountNumber, amount, description } = req.body;
+
+        const result = await quickTransferByFavoriteInDB({
+            favoriteId,
+            ownerUserId: req.user?.id,
+            fromAccountNumber,
+            amount,
+            description,
+            createdByUserId: req.user?.id || null,
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: 'Transferencia rápida aplicada exitosamente',
             result,
         });
     } catch (err) {

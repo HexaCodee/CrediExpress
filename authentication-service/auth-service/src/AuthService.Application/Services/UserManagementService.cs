@@ -8,6 +8,48 @@ namespace AuthService.Application.Services;
 
 public class UserManagementService(IUserRepository users, IRoleRepository roles) : IUserManagementService
 {
+    private static bool IsAdmin(User user) => user.UserRoles.Any(r => r.Role.Name == RoleConstants.BANK_ADMIN);
+
+    private static UserResponseDto MapToUserResponse(User user)
+    {
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Surname = user.Surname,
+            Username = user.Username,
+            Email = user.Email,
+            Phone = user.UserProfile?.Phone ?? string.Empty,
+            AccountNumber = user.UserProfile?.AccountNumber ?? string.Empty,
+            Dpi = user.UserProfile?.Dpi ?? string.Empty,
+            Address = user.UserProfile?.Address ?? string.Empty,
+            JobName = user.UserProfile?.JobName ?? string.Empty,
+            MonthlyIncome = user.UserProfile?.MonthlyIncome ?? 0,
+            Role = user.UserRoles.FirstOrDefault()?.Role?.Name ?? RoleConstants.CLIENT,
+            Status = user.Status,
+            IsEmailVerified = user.UserEmail?.EmailVerified ?? false,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt
+        };
+    }
+
+    private async Task<User> EnsureManageableTargetAsync(string requesterUserId, string targetUserId)
+    {
+        var requester = await users.GetByIdAsync(requesterUserId);
+        if (!IsAdmin(requester))
+        {
+            throw new UnauthorizedAccessException("Solo un administrador puede gestionar usuarios");
+        }
+
+        var target = await users.GetByIdAsync(targetUserId);
+        if (target.Id != requesterUserId && IsAdmin(target))
+        {
+            throw new InvalidOperationException("No se puede administrar otro usuario administrador");
+        }
+
+        return target;
+    }
+
     public async Task<UserResponseDto> UpdateUserRoleAsync(string userId, string roleName)
     {
         // Normalize
@@ -95,5 +137,56 @@ public class UserManagementService(IUserRepository users, IRoleRepository roles)
             CreatedAt = u.CreatedAt,
             UpdatedAt = u.UpdatedAt
         }).ToList();
+    }
+
+    public async Task<IReadOnlyList<UserResponseDto>> GetManageableUsersAsync(string requesterUserId)
+    {
+        var requester = await users.GetByIdAsync(requesterUserId);
+        if (!IsAdmin(requester))
+        {
+            throw new UnauthorizedAccessException("Solo un administrador puede gestionar usuarios");
+        }
+
+        var allUsers = await users.GetAllAsync();
+        return allUsers
+            .Where(u => u.Id == requesterUserId || !IsAdmin(u))
+            .Select(MapToUserResponse)
+            .ToList();
+    }
+
+    public async Task<UserResponseDto> GetManageableUserByIdAsync(string requesterUserId, string targetUserId)
+    {
+        var target = await EnsureManageableTargetAsync(requesterUserId, targetUserId);
+        return MapToUserResponse(target);
+    }
+
+    public async Task<UserResponseDto> UpdateUserByAdminAsync(string requesterUserId, string targetUserId, UpdateUserByAdminDto updateDto)
+    {
+        var target = await EnsureManageableTargetAsync(requesterUserId, targetUserId);
+
+        if (!string.IsNullOrWhiteSpace(updateDto.Name)) target.Name = updateDto.Name.Trim();
+        if (!string.IsNullOrWhiteSpace(updateDto.Surname)) target.Surname = updateDto.Surname.Trim();
+        if (!string.IsNullOrWhiteSpace(updateDto.Username)) target.Username = updateDto.Username.Trim();
+        if (!string.IsNullOrWhiteSpace(updateDto.Email)) target.Email = updateDto.Email.Trim().ToLowerInvariant();
+        if (updateDto.Status.HasValue) target.Status = updateDto.Status.Value;
+
+        if (target.UserProfile != null)
+        {
+            if (!string.IsNullOrWhiteSpace(updateDto.Phone)) target.UserProfile.Phone = updateDto.Phone.Trim();
+            if (!string.IsNullOrWhiteSpace(updateDto.Address)) target.UserProfile.Address = updateDto.Address.Trim();
+            if (!string.IsNullOrWhiteSpace(updateDto.JobName)) target.UserProfile.JobName = updateDto.JobName.Trim();
+            if (updateDto.MonthlyIncome.HasValue) target.UserProfile.MonthlyIncome = updateDto.MonthlyIncome.Value;
+            target.UserProfile.UpdatedAt = DateTime.UtcNow;
+        }
+
+        target.UpdatedAt = DateTime.UtcNow;
+        var updated = await users.UpdateAsync(target);
+        return MapToUserResponse(updated);
+    }
+
+    public async Task DeleteUserByAdminAsync(string requesterUserId, string targetUserId)
+    {
+        await EnsureManageableTargetAsync(requesterUserId, targetUserId);
+        await users.DeleteAsync(targetUserId);
     }
 }

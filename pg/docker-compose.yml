@@ -8,6 +8,7 @@ services:
       POSTGRES_USER: IN6AM
       POSTGRES_PASSWORD: In6amKnl!
       POSTGRES_DB: crediexpress
+      POSTGRES_INITDB_ARGS: --auth-host=md5 --auth-local=trust
     ports:
       - "5436:5432"
     volumes:

@@ -1,66 +1,52 @@
 # Español
 # SistemaBancario
 
-Sistema bancario seguro de arquitectura full-stack para la gestión de cuentas, procesamiento de transacciones y manejo de conversión de divisas. Desarrollado utilizando React, Node.js, .NET y Docker bajo el marco ágil SCRUM, garantizando una sólida seguridad, escalabilidad y operaciones de alto rendimiento.
+Sistema bancario con arquitectura de microservicios para gestión de usuarios, roles, cuentas, productos, divisas y operaciones bancarias. El repositorio integra servicios en Node.js y .NET, con PostgreSQL y MongoDB como motores de datos.
 
 ## Funcionalidades Principales
 
 ### Autenticación y Autorización
 
-* Registro de clientes
-* Inicio de sesión con JWT
-* Autenticación Multifactor (MFA) opcional
-* Protección de rutas con JWT Bearer Authentication
-* Sistema de roles
-* Control de acceso basado en roles
-* Cierre de sesión seguro
-* Bloqueo de cuenta por intentos fallidos
+* Registro y autenticación de usuarios (servicios .NET)
+* JWT para autorización entre servicios
+* Gestión de roles y permisos
+* Middleware de validación de token y control de acceso
 
 ---
 
-### Gestión de Clientes
+### Gestión de Clientes y Cuentas
 
-* Creación y actualización de perfiles de cliente
-* Consulta de cliente por ID
-* Perfiles de usuario con foto (Cloudinary)
-* Activación / desactivación de cuentas
-* Verificación básica de identidad
-
----
-
-### Gestión de Cuentas Bancarias
-
-* Creación de cuentas
-* Consulta de saldo en tiempo real
-* Estado de cuenta detallado
-* Bloqueo / desbloqueo de cuenta
-* Asociación de múltiples cuentas a un cliente
+* Gestión de perfiles de cuenta bancaria
+* Administración de tipos de cuenta
+* Apertura, bloqueo, desbloqueo y cierre de cuentas
+* Consultas de cuentas por usuario y por número
 
 ---
 
-### Gestión de Transacciones
+### Gestión Bancaria Operativa
 
-* Transferencias internas entre cuentas
-* Transferencias externas
-* Depósitos
-* Validación de fondos disponibles
-
----
-
-### Conversión de Divisas
-
-* Conversión entre múltiples monedas
-* Consulta de tasas de cambio en tiempo real
-* Cálculo automático de comisión
+* Depósitos y transferencias
+* Historial de movimientos y consultas recientes
+* Gestión de cuentas favoritas
+* Reportes operativos para administración
 
 ---
 
-### Seguridad
+### Productos y Divisas
 
-* Tokens JWT con expiración
-* Encriptación de datos sensibles
-* Rate limiting en endpoints críticos
-* Middleware de manejo global de excepciones
+* Gestión de productos bancarios
+* Gestión de monedas
+* Cotización y conversión de divisas
+* Actualización de tasas de cambio
+
+---
+
+### Seguridad y Observabilidad
+
+* Rate limiting y headers de seguridad
+* Manejo global de errores
+* Logging en servicios Node.js y .NET
+* Endpoints de health check por servicio
 
 ---
 
@@ -68,234 +54,108 @@ Sistema bancario seguro de arquitectura full-stack para la gestión de cuentas, 
 
 ### Backend
 
-* **Framework**: ASP.NET Core 8.0
-* **Lenguaje**: C# (.NET 8)
-* **Arquitectura**: Clean Architecture (4 capas)
+* **Node.js** + **Express** (microservicios de dominio)
+* **ASP.NET Core 8** (servicios de autenticación y login)
+* **JavaScript (ES Modules)** y **C# (.NET 8)**
 
 ### Base de Datos
 
-* **ORM**: Entity Framework Core 9.0
-* **Base de Datos**: PostgreSQL y MongoDB
-* **Migraciones**: EF Core Migrations
-* **Naming Convention**: Snake case
+* **MongoDB** (servicios Node.js)
+* **PostgreSQL** (servicios .NET)
+* **Mongoose** y **Entity Framework Core**
 
 ### Seguridad
 
-* **JWT**: System.IdentityModel.Tokens.Jwt
-* **Hashing**: Argon2 (Konscious.Security.Cryptography.Argon2)
-* **Authentication**: Microsoft.AspNetCore.Authentication.JwtBearer
-* **Headers**: NetEscapades.AspNetCore.SecurityHeaders
+* **JWT** para autenticación/autorización
+* **Helmet**, **CORS**, **express-rate-limit**
+* **Security Headers** y configuración de autenticación en .NET
 
-### Servicios Externos
+### Infraestructura y Herramientas
 
-* **Email**: MailKit (SMTP)
-* **Almacenamiento**: Cloudinary(imágenes de perfil)
-
-### Validación y Logging
-
-* **Validación**: FluentValidation
-* **Logging**: Serilog.AspNetCore
+* **Docker Compose** para PostgreSQL y MongoDB
+* **pnpm** para servicios Node.js
+* **dotnet CLI** para servicios .NET
+* **Postman collection** incluida
 
 ## Endpoints API
 
-Base URL: `http://localhost:5062/api/v1`
+Prefijos principales:
+
+* Node.js: `http://localhost:<puerto>/crediExpress/v1`
+* .NET: `http://localhost:5222/api/v1` (AuthService) y `http://localhost:5062/api/v1` (LogService)
 
 ---
 
-## Login/Register (/log)
+## Servicios del Proyecto
 
-| Método | Ruta                        | Descripción                              | Auth |
-|--------|----------------------------|------------------------------------------|------|
-| POST   | /log/register             | Registrar nuevo usuario                  | No   |
-| POST   | /log/login                | Iniciar sesión                           | No   |
-| POST   | /log/verify-email         | Verificar correo electrónico             | No   |
+| Servicio | Stack | Puerto local | Base path principal | Health |
+|--------|-------|------------|---------------------|--------|
+| accountType-service | Node.js | 3003 | `/crediExpress/v1/account-types` | `/crediExpress/v1/health` |
+| account-service | Node.js | 3004 | `/crediExpress/v1/accounts` | `/crediExpress/v1/health` |
+| bank-service | Node.js | 3006 | `/crediExpress/v1/bank` | `/crediExpress/v1/health` |
+| core-banking-service | Node.js | 3007 | `/crediExpress/v1/core-banking` | `/crediExpress/v1/health` |
+| product-currency-service | Node.js | 3008 | `/crediExpress/v1/products` y `/crediExpress/v1/currencies` | `/crediExpress/v1/health` |
+| currency-conversion-service | Node.js | 3009 | `/crediExpress/v1/conversions` | `/crediExpress/v1/health` |
+| role-node | Node.js | 3002 | `/crediExpress/v1/roles` | `/crediExpress/v1/health` |
+| authentication-service/auth-service | .NET | 5222 | `/api/v1` | `/api/v1/health` |
+| login-service/log-service | .NET | 5062 | `/api/v1` | `/api/v1/health` |
 
----
+> Nota: los servicios Node.js usan MongoDB y los servicios .NET usan PostgreSQL.
 
-## Salud (/health)
-
-| Método | Ruta     | Descripción           | Auth |
-|--------|----------|----------------------|------|
-| GET    | /health  | Estado del servicio  | No   |
-
-## Modelos de Request
-
-### Registro (/log/register)
-
-```json
-{
-  "Name": "Joshua",
-  "Surname": "Solares",
-  "username": "jsolares",
-  "email": "usuario@ejemplo.com",
-  "password": "Contraseña123!",
-  "phone": "12345678"
-}
-```
-
-### Login (/log/login)
-
-```json
-{
-    "EmailOrUsername":"admin",
-    "Password":"Informatica2026?"
-}
-```
-
-### Verificación de Email (/log/verify-email)
-
-```json
-{
-    "Token": "lPXyiDMkuR9-1Kxu0X4gnKjhxZS4VDHQ2zCSJflNlXw"
-}
-```
 ## 📁 Estructura del Proyecto
 
-```
+```text
 CrediExpress/
 │
-├── src/
-│   │
-│   ├── CrediExpress.Api/                 # Capa de presentación (API)
-│   │   ├── Controllers/                  # Controladores HTTP
-│   │   ├── Middlewares/                  # Middlewares personalizados
-│   │   ├── Extensions/                   # Configuraciones y extensiones
-│   │   ├── Filters/                      # Filtros globales
-│   │   ├── Program.cs                    # Punto de entrada
-│   │   └── appsettings.json              # Configuración general
-│   │
-│   ├── CrediExpress.Application/         # Lógica de negocio
-│   │   ├── DTOs/                         # Objetos de transferencia de datos
-│   │   ├── Interfaces/                   # Contratos de servicios
-│   │   ├── Services/                     # Implementación de servicios
-│   │   ├── Validators/                   # Validaciones (FluentValidation)
-│   │   └── Mappings/                     # Configuración de AutoMapper
-│   │
-│   ├── CrediExpress.Domain/              # Entidades y reglas de dominio
-│   │   ├── Entities/                     # Entidades principales
-│   │   ├── Enums/                        # Enumeraciones
-│   │   └── ValueObjects/                 # Objetos de valor
-│   │
-│   ├── CrediExpress.Infrastructure/      # Acceso a datos y servicios externos
-│   │   ├── Persistence/                  # DbContext y configuraciones EF Core
-│   │   ├── Repositories/                 # Implementación de repositorios
-│   │   ├── Configurations/               # Configuraciones de base de datos
-│   │   └── ExternalServices/             # Integraciones externas
-│   │
-│   └── CrediExpress.Tests/               # Pruebas unitarias
-│
-├── docker-compose.yml                    # Orquestación de contenedores
-├── Dockerfile                            # Imagen del backend
-├── .gitignore                            # Archivos ignorados por Git
-├── CrediExpress.sln                      # Solución .NET
-└── README.md                             # Documentación del proyecto
+├── account-service/
+├── accountType-service/
+├── authentication-service/
+│   └── auth-service/
+├── bank-service/
+├── core-banking-service/
+├── currency-conversion-service/
+├── login-service/
+│   └── log-service/
+├── product-currency-service/
+├── role-node/
+├── pg/
+│   └── docker-compose.yml
+├── postman/
+│   └── CrediExpress.postman_collection.json
+├── LICENSE
+└── README.md
 ```
+
 ## Configuración
 
 ### Requisitos Previos
 
-* MongoDB
-* PostgreSQL 13 o superior
-* Docker (opcional)
+* Node.js 20+
+* pnpm 10+
+* .NET SDK 8+
+* Docker y Docker Compose
 * Git
-* Cuenta de Gmail
 
 ### Variables de Configuración
 
-Crear `appsettings.Development.json` en `src/LogService.Api/`:
+Cada servicio Node.js utiliza su propio archivo `.env` con valores como:
+
+```env
+PORT=3002
+URI_MONGODB=mongodb://<usuario>:<password>@localhost:27017/<database>?authSource=admin
+JWT_ISSUER=<issuer>
+JWT_AUDIENCE=<audience>
+JWT_SECRET=<secret>
+JWT_EXPIRES_IN=1h
+```
+
+Los servicios .NET usan `appsettings.json` / `appsettings.Development.json` con una cadena de conexión PostgreSQL como:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=crediexpress;Username=IN6AM;Password=In6amKnl!;Port=5436"
-  },
-  "CloudinarySettings": {
-    "CloudName": "dpxs0f5zw",
-    "ApiKey": "521768524693749",
-    "ApiSecret": "1Z2fmRasGsJ0-kVYEeXSX4s0Mdg",
-    "BaseUrl": "https://res.cloudinary.com/dpxs0f5zw/image/upload/v1769786206/",
-    "Folder": "auth_crediexpress/profiles",
-    "DefaultAvatarPath": "avatarDefault-1749508519496.png"
-  },
-  "SmtpSettings": {
-    "Host": "smtp.gmail.com",
-    "Port": "465",
-    "EnableSsl": "true",
-    "Username": "official.hexacodee@gmail.com",
-    "Password": "bogo pufu dyko lxke",
-    "FromEmail": "official.hexacodee@gmail.com",
-    "FromName": "CrediExpress Soporte",
-    "Enabled": true,
-    "Timeout": 10000,
-    "UseFallback": false,
-    "UseImplicitSsl": true,
-    "IgnoreCertificateErrors": true
-  },
-  "JwtSettings": {
-    "SecretKey": "E$3cr3tK3yF0rKln4lSp0rts@In6am2024",
-    "Issuer": "CrediExpress",
-    "Audience": "CrediExpress",
-    "ExpirationMinutes": 60
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AppSettings": {
-    "FrontendUrl": "http://localhost:3000"
-  },
-  "Security": {
-    "AllowedOrigins": [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "https://localhost:3000",
-      "https://localhost:3001"
-    ],
-    "AdminAllowedOrigins": [
-      "http://localhost:3000"
-    ],
-    "BlacklistedIPs": [],
-    "WhitelistedIPs": [],
-    "RestrictedPaths": []
-  },
-  "Serilog": {
-    "Using": [
-      "Serilog.Sinks.Console",
-      "Serilog.Sinks.File"
-    ],
-    "MinimumLevel": {
-      "Default": "Information",
-      "Override": {
-        "Microsoft": "Warning",
-        "Microsoft.AspNetCore": "Warning",
-        "Microsoft.Hosting.Lifetime": "Warning",
-        "System": "Warning"
-      }
-    },
-    "WriteTo": [
-      {
-        "Name": "Console",
-        "Args": {
-          "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
-        }
-      },
-      {
-        "Name": "File",
-        "Args": {
-          "path": "logs/log-service-.txt",
-          "rollingInterval": "Day",
-          "outputTemplate": "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}",
-          "retainedFileCountLimit": 30
-        }
-      }
-    ],
-    "Enrich": [
-      "FromLogContext"
-    ]
-  },
-  "AllowedHosts": "*"
+    "DefaultConnection": "Host=localhost;Port=5436;Database=crediexpress;Username=<user>;Password=<password>"
+  }
 }
 ```
 
@@ -305,35 +165,73 @@ Crear `appsettings.Development.json` en `src/LogService.Api/`:
 
 ```bash
 git clone <url-repositorio>
-cd auth-service
+cd CrediExpress
 ```
 
 ---
 
-### 2️⃣ Restaurar dependencias
+### 2️⃣ Levantar bases de datos (PostgreSQL + MongoDB)
 
 ```bash
+cd pg
+docker compose up -d
+```
+
+---
+
+### 3️⃣ Ejecutar servicios Node.js
+
+Ejemplo (`role-node`):
+
+```bash
+cd role-node
+pnpm install
+pnpm run dev
+```
+
+Repetir en cada carpeta Node.js:
+
+* `account-service`
+* `accountType-service`
+* `bank-service`
+* `core-banking-service`
+* `product-currency-service`
+* `currency-conversion-service`
+* `role-node`
+
+---
+
+### 4️⃣ Ejecutar servicios .NET
+
+AuthService:
+
+```bash
+cd authentication-service/auth-service/src/AuthService.Api
 dotnet restore
-```
-
----
-
-### 3️⃣ Aplicar migraciones a la base de datos
-
-```bash
-cd src/AuthService.Api
-dotnet ef database update
-```
-
----
-
-### 4️⃣ Ejecutar el servicio
-
-```bash
 dotnet run
 ```
 
-El servicio estará disponible en: `http://localhost:5062/api/v1`
+LogService:
+
+```bash
+cd login-service/log-service/src/LogService.Api
+dotnet restore
+dotnet run
+```
+
+---
+
+### 5️⃣ Validar health checks
+
+* `http://localhost:3002/crediExpress/v1/health`
+* `http://localhost:3003/crediExpress/v1/health`
+* `http://localhost:3004/crediExpress/v1/health`
+* `http://localhost:3006/crediExpress/v1/health`
+* `http://localhost:3007/crediExpress/v1/health`
+* `http://localhost:3008/crediExpress/v1/health`
+* `http://localhost:3009/crediExpress/v1/health`
+* `http://localhost:5222/api/v1/health`
+* `http://localhost:5062/api/v1/health`
 
 ## Créditos
 
@@ -350,66 +248,52 @@ Licencia MIT
 # English
 # SistemaBancario
 
-Secure full-stack banking system for account management, transaction processing, and currency exchange handling. Developed using React, Node.js, .NET, and Docker under the SCRUM agile framework, ensuring strong security, scalability, and high-performance operations.
+Banking system based on a microservices architecture for user management, roles, accounts, products, currencies, and core banking operations. This repository combines Node.js and .NET services, using PostgreSQL and MongoDB as data stores.
 
 ## Main Features
 
 ### Authentication & Authorization
 
-* Customer registration
-* JWT-based login
-* Optional Multi-Factor Authentication (MFA)
-* Route protection with JWT Bearer Authentication
-* Role-based system
-* Role-Based Access Control (RBAC)
-* Secure logout
-* Account lockout after failed login attempts
+* User registration and authentication (.NET services)
+* JWT-based authorization across services
+* Role and permission management
+* Token validation and access-control middleware
 
 ---
 
-### Customer Management
+### Customer and Account Management
 
-* Create and update customer profiles
-* Get customer by ID
-* User profiles with photo (Cloudinary)
-* Account activation / deactivation
-* Basic identity verification
-
----
-
-### Bank Account Management
-
-* Account creation
-* Real-time balance inquiry
-* Detailed account statement
-* Account lock / unlock
-* Multiple accounts per customer
+* Bank profile/account management
+* Account type administration
+* Open, block, unblock, and close accounts
+* Account queries by user and account number
 
 ---
 
-### Transaction Management
+### Core Banking Operations
 
-* Internal transfers between accounts
-* External transfers
-* Deposits
-* Available funds validation
-
----
-
-### Currency Exchange
-
-* Multi-currency conversion
-* Real-time exchange rate consultation
-* Automatic fee calculation
+* Deposits and transfers
+* Transaction history and recent activity
+* Favorite accounts management
+* Operational admin queries
 
 ---
 
-### Security
+### Products and Currencies
 
-* JWT tokens with expiration
-* Sensitive data encryption
-* Rate limiting on critical endpoints
-* Global exception handling middleware
+* Banking product management
+* Currency catalog management
+* FX quote and conversion
+* Exchange rate refresh operations
+
+---
+
+### Security and Observability
+
+* Rate limiting and security headers
+* Global error handling
+* Logging on Node.js and .NET services
+* Health check endpoints per service
 
 ---
 
@@ -417,176 +301,107 @@ Secure full-stack banking system for account management, transaction processing,
 
 ### Backend
 
-* **Framework**: ASP.NET Core 8.0
-* **Language**: C# (.NET 8)
-* **Architecture**: Clean Architecture (4 layers)
+* **Node.js** + **Express** (domain microservices)
+* **ASP.NET Core 8** (auth and login services)
+* **JavaScript (ES Modules)** and **C# (.NET 8)**
 
 ### Database
 
-* **ORM**: Entity Framework Core 9.0
-* **Database**: PostgreSQL and MongoDB
-* **Migrations**: EF Core Migrations
-* **Naming Convention**: Snake case
+* **MongoDB** (Node.js services)
+* **PostgreSQL** (.NET services)
+* **Mongoose** and **Entity Framework Core**
 
 ### Security
 
-* **JWT**: System.IdentityModel.Tokens.Jwt
-* **Hashing**: Argon2 (Konscious.Security.Cryptography.Argon2)
-* **Authentication**: Microsoft.AspNetCore.Authentication.JwtBearer
-* **Headers**: NetEscapades.AspNetCore.SecurityHeaders
+* **JWT** for authentication/authorization
+* **Helmet**, **CORS**, **express-rate-limit**
+* **Security headers** and .NET auth configuration
 
-### External Services
+### Infrastructure & Tooling
 
-* **Email**: MailKit (SMTP)
-* **Storage**: Cloudinary (profile images)
-
-### Validation & Logging
-
-* **Validation**: FluentValidation
-* **Logging**: Serilog.AspNetCore
+* **Docker Compose** for PostgreSQL and MongoDB
+* **pnpm** for Node.js services
+* **dotnet CLI** for .NET services
+* Included **Postman collection**
 
 ## API Endpoints
 
-Base URL: `http://localhost:5062/api/v1`
+Main prefixes:
+
+* Node.js: `http://localhost:<port>/crediExpress/v1`
+* .NET: `http://localhost:5222/api/v1` (AuthService) and `http://localhost:5062/api/v1` (LogService)
 
 ---
 
-## Login/Register (/log)
+## Project Services
 
-| Method | Route                | Description              | Auth |
-|--------|----------------------|--------------------------|------|
-| POST   | /log/register        | Register new user        | No   |
-| POST   | /log/login           | Login                    | No   |
-| POST   | /log/verify-email    | Verify email             | No   |
+| Service | Stack | Local port | Main base path | Health |
+|--------|-------|----------|----------------|--------|
+| accountType-service | Node.js | 3003 | `/crediExpress/v1/account-types` | `/crediExpress/v1/health` |
+| account-service | Node.js | 3004 | `/crediExpress/v1/accounts` | `/crediExpress/v1/health` |
+| bank-service | Node.js | 3006 | `/crediExpress/v1/bank` | `/crediExpress/v1/health` |
+| core-banking-service | Node.js | 3007 | `/crediExpress/v1/core-banking` | `/crediExpress/v1/health` |
+| product-currency-service | Node.js | 3008 | `/crediExpress/v1/products` and `/crediExpress/v1/currencies` | `/crediExpress/v1/health` |
+| currency-conversion-service | Node.js | 3009 | `/crediExpress/v1/conversions` | `/crediExpress/v1/health` |
+| role-node | Node.js | 3002 | `/crediExpress/v1/roles` | `/crediExpress/v1/health` |
+| authentication-service/auth-service | .NET | 5222 | `/api/v1` | `/api/v1/health` |
+| login-service/log-service | .NET | 5062 | `/api/v1` | `/api/v1/health` |
 
----
-
-## Health (/health)
-
-| Method | Route    | Description        | Auth |
-|--------|----------|--------------------|------|
-| GET    | /health  | Service status     | No   |
-
-## Request Models
-
-### Register (/log/register)
-
-```json
-{
-  "Name": "Joshua",
-  "Surname": "Solares",
-  "username": "jsolares",
-  "email": "usuario@ejemplo.com",
-  "password": "Contraseña123!",
-  "phone": "12345678"
-}
-```
-
-### Login (/log/login)
-
-```json
-{
-  "EmailOrUsername": "admin",
-  "Password": "Informatica2026?"
-}
-```
-
-### Email Verification (/log/verify-email)
-
-```json
-{
-  "Token": "lPXyiDMkuR9-1Kxu0X4gnKjhxZS4VDHQ2zCSJflNlXw"
-}
-```
+> Note: Node.js services use MongoDB and .NET services use PostgreSQL.
 
 ## 📁 Project Structure
 
-```
+```text
 CrediExpress/
 │
-├── src/
-│   │
-│   ├── CrediExpress.Api/                 # Presentation layer (API)
-│   │   ├── Controllers/                  # HTTP controllers
-│   │   ├── Middlewares/                  # Custom middlewares
-│   │   ├── Extensions/                   # Configurations and extensions
-│   │   ├── Filters/                      # Global filters
-│   │   ├── Program.cs                    # Entry point
-│   │   └── appsettings.json              # General configuration
-│   │
-│   ├── CrediExpress.Application/         # Business logic layer
-│   │   ├── DTOs/                         # Data Transfer Objects
-│   │   ├── Interfaces/                   # Service contracts
-│   │   ├── Services/                     # Service implementations
-│   │   ├── Validators/                   # FluentValidation validators
-│   │   └── Mappings/                     # AutoMapper configurations
-│   │
-│   ├── CrediExpress.Domain/              # Domain entities and rules
-│   │   ├── Entities/                     # Core entities
-│   │   ├── Enums/                        # Enumerations
-│   │   └── ValueObjects/                 # Value objects
-│   │
-│   ├── CrediExpress.Infrastructure/      # Data access and external services
-│   │   ├── Persistence/                  # DbContext and EF Core configurations
-│   │   ├── Repositories/                 # Repository implementations
-│   │   ├── Configurations/               # Database configurations
-│   │   └── ExternalServices/             # External integrations
-│   │
-│   └── CrediExpress.Tests/               # Unit tests
-│
-├── docker-compose.yml                    # Container orchestration
-├── Dockerfile                            # Backend image
-├── .gitignore                            # Git ignored files
-├── CrediExpress.sln                      # .NET solution
-└── README.md                             # Project documentation
+├── account-service/
+├── accountType-service/
+├── authentication-service/
+│   └── auth-service/
+├── bank-service/
+├── core-banking-service/
+├── currency-conversion-service/
+├── login-service/
+│   └── log-service/
+├── product-currency-service/
+├── role-node/
+├── pg/
+│   └── docker-compose.yml
+├── postman/
+│   └── CrediExpress.postman_collection.json
+├── LICENSE
+└── README.md
 ```
 
 ## Configuration
 
 ### Prerequisites
 
-* MongoDB
-* PostgreSQL 13 or higher
-* Docker (optional)
+* Node.js 20+
+* pnpm 10+
+* .NET SDK 8+
+* Docker and Docker Compose
 * Git
-* Gmail account
 
 ### Configuration Variables
 
-Create `appsettings.Development.json` inside `src/LogService.Api/`:
+Each Node.js service uses its own `.env` file with values such as:
+
+```env
+PORT=3002
+URI_MONGODB=mongodb://<user>:<password>@localhost:27017/<database>?authSource=admin
+JWT_ISSUER=<issuer>
+JWT_AUDIENCE=<audience>
+JWT_SECRET=<secret>
+JWT_EXPIRES_IN=1h
+```
+
+.NET services use `appsettings.json` / `appsettings.Development.json` with a PostgreSQL connection string like:
 
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=crediexpress;Username=IN6AM;Password=In6amKnl!;Port=5436"
-  },
-  "CloudinarySettings": {
-    "CloudName": "dpxs0f5zw",
-    "ApiKey": "521768524693749",
-    "ApiSecret": "1Z2fmRasGsJ0-kVYEeXSX4s0Mdg",
-    "BaseUrl": "https://res.cloudinary.com/dpxs0f5zw/image/upload/v1769786206/",
-    "Folder": "auth_crediexpress/profiles",
-    "DefaultAvatarPath": "avatarDefault-1749508519496.png"
-  },
-  "SmtpSettings": {
-    "Host": "smtp.gmail.com",
-    "Port": "465",
-    "EnableSsl": "true",
-    "Username": "official.hexacodee@gmail.com",
-    "Password": "bogo pufu dyko lxke",
-    "FromEmail": "official.hexacodee@gmail.com",
-    "FromName": "CrediExpress Support",
-    "Enabled": true,
-    "Timeout": 10000,
-    "UseFallback": false,
-    "UseImplicitSsl": true,
-    "IgnoreCertificateErrors": true
-  },
-  "JwtSettings": {
-    "SecretKey": "E$3cr3tK3yF0rKln4lSp0rts@In6am2024",
-    "Issuer": "CrediExpress",
-    "Audience": "CrediExpress",
-    "ExpirationMinutes": 60
+    "DefaultConnection": "Host=localhost;Port=5436;Database=crediexpress;Username=<user>;Password=<password>"
   }
 }
 ```
@@ -597,35 +412,73 @@ Create `appsettings.Development.json` inside `src/LogService.Api/`:
 
 ```bash
 git clone <repository-url>
-cd auth-service
+cd CrediExpress
 ```
 
 ---
 
-### 2️⃣ Restore dependencies
+### 2️⃣ Start databases (PostgreSQL + MongoDB)
 
 ```bash
+cd pg
+docker compose up -d
+```
+
+---
+
+### 3️⃣ Run Node.js services
+
+Example (`role-node`):
+
+```bash
+cd role-node
+pnpm install
+pnpm run dev
+```
+
+Repeat in each Node.js folder:
+
+* `account-service`
+* `accountType-service`
+* `bank-service`
+* `core-banking-service`
+* `product-currency-service`
+* `currency-conversion-service`
+* `role-node`
+
+---
+
+### 4️⃣ Run .NET services
+
+AuthService:
+
+```bash
+cd authentication-service/auth-service/src/AuthService.Api
 dotnet restore
-```
-
----
-
-### 3️⃣ Apply database migrations
-
-```bash
-cd src/AuthService.Api
-dotnet ef database update
-```
-
----
-
-### 4️⃣ Run the service
-
-```bash
 dotnet run
 ```
 
-The service will be available at: `http://localhost:5062/api/v1`
+LogService:
+
+```bash
+cd login-service/log-service/src/LogService.Api
+dotnet restore
+dotnet run
+```
+
+---
+
+### 5️⃣ Validate health checks
+
+* `http://localhost:3002/crediExpress/v1/health`
+* `http://localhost:3003/crediExpress/v1/health`
+* `http://localhost:3004/crediExpress/v1/health`
+* `http://localhost:3006/crediExpress/v1/health`
+* `http://localhost:3007/crediExpress/v1/health`
+* `http://localhost:3008/crediExpress/v1/health`
+* `http://localhost:3009/crediExpress/v1/health`
+* `http://localhost:5222/api/v1/health`
+* `http://localhost:5062/api/v1/health`
 
 ## Credits
 

@@ -15,16 +15,92 @@ import { checkValidators } from '../../middlewares/check-validators.js';
 
 const router = Router();
 
+/**
+ * @swagger
+ * /bank/summary/portfolio:
+ *   get:
+ *     summary: Obtiene resumen de portafolio
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Resumen obtenido correctamente
+ */
 router.get('/summary/portfolio', [validateJWT, isAdminRole], getPortfolioSummary);
 
+/**
+ * @swagger
+ * /bank:
+ *   get:
+ *     summary: Lista perfiles bancarios
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Perfiles obtenidos correctamente
+ */
 router.get('/', [validateJWT, isAdminRole], getBankProfiles);
 
+/**
+ * @swagger
+ * /bank/{userId}:
+ *   get:
+ *     summary: Obtiene perfil bancario por userId
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Perfil obtenido correctamente
+ */
 router.get('/:userId', [
     validateJWT,
     check('userId', 'El userId es obligatorio').not().isEmpty(),
     checkValidators,
 ], getBankProfileByUserId);
 
+/**
+ * @swagger
+ * /bank:
+ *   post:
+ *     summary: Crea un perfil bancario
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [userId, accountNumbers]
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               accountNumbers:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               primaryAccountNumber:
+ *                 type: string
+ *               preferredCurrency:
+ *                 type: string
+ *               profileStatus:
+ *                 type: string
+ *               riskLevel:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Perfil creado correctamente
+ */
 router.post('/', [
     validateJWT,
     isAdminRole,
@@ -38,6 +114,30 @@ router.post('/', [
     checkValidators,
 ], createBankProfile);
 
+/**
+ * @swagger
+ * /bank/{userId}:
+ *   put:
+ *     summary: Actualiza un perfil bancario
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Perfil actualizado correctamente
+ */
 router.put('/:userId', [
     validateJWT,
     isAdminRole,
@@ -49,6 +149,34 @@ router.put('/:userId', [
     checkValidators,
 ], updateBankProfile);
 
+/**
+ * @swagger
+ * /bank/{userId}/primary-account:
+ *   patch:
+ *     summary: Define cuenta primaria
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [primaryAccountNumber]
+ *             properties:
+ *               primaryAccountNumber:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Cuenta primaria actualizada correctamente
+ */
 router.patch('/:userId/primary-account', [
     validateJWT,
     isAdminRole,
@@ -58,6 +186,35 @@ router.patch('/:userId/primary-account', [
     checkValidators,
 ], setPrimaryAccount);
 
+/**
+ * @swagger
+ * /bank/{userId}/status:
+ *   patch:
+ *     summary: Actualiza estado del perfil
+ *     tags: [BankProfiles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [profileStatus]
+ *             properties:
+ *               profileStatus:
+ *                 type: string
+ *                 enum: [ACTIVE, SUSPENDED]
+ *     responses:
+ *       200:
+ *         description: Estado actualizado correctamente
+ */
 router.patch('/:userId/status', [
     validateJWT,
     isAdminRole,

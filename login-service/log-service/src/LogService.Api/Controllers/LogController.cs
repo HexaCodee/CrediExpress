@@ -10,10 +10,15 @@ namespace LoginService.Api.Controllers;
 
 [ApiController]
 [Route ("api/v1/[controller]")]
+[Produces("application/json")]
 public class LogController(ILogService logService) : ControllerBase
 {
     [HttpPost("login")]
     [EnableRateLimiting("AuthPolicy")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(LogResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<LogResponseDto>> Login([FromBody] LoginDto loginDto)
     {
         var result = await logService.LoginAsync(loginDto);
@@ -22,6 +27,8 @@ public class LogController(ILogService logService) : ControllerBase
 
     [HttpPost("logout")]
     [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<object>> Logout()
     {
         var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;

@@ -10,11 +10,16 @@ namespace AuthService.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
+[Produces("application/json")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost("register")]
     [RequestSizeLimit(10 * 1024 * 1024)]
     [EnableRateLimiting("AuthPolicy")]
+    [Consumes("multipart/form-data")]
+    [ProducesResponseType(typeof(RegisterResponseDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<RegisterResponseDto>> Register([FromForm] RegisterDto registerDto)
     {
         var result = await authService.RegisterAsync(registerDto);
@@ -23,6 +28,10 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     [HttpPost("verify-email")]
     [EnableRateLimiting("ApiPolicy")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(EmailResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<EmailResponseDto>> VerifyEmail([FromBody] VerifyEmailDto verifyEmailDto)
     {
         var result = await authService.VerifyEmailAsync(verifyEmailDto);
@@ -31,6 +40,9 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     [HttpGet("verify-email")]
     [EnableRateLimiting("ApiPolicy")]
+    [ProducesResponseType(typeof(EmailResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<EmailResponseDto>> VerifyEmailFromLink([FromQuery] string token)
     {
         var result = await authService.VerifyEmailAsync(new VerifyEmailDto { Token = token });
@@ -39,6 +51,10 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     [HttpPost("resend-verification")]
     [EnableRateLimiting("ApiPolicy")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(EmailResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<EmailResponseDto>> ResendVerification([FromBody] ResendVerificationDto resendDto)
     {
         var result = await authService.ResendVerificationEmailAsync(resendDto);
@@ -47,6 +63,10 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     [HttpPost("forgot-password")]
     [EnableRateLimiting("ApiPolicy")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(EmailResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<EmailResponseDto>> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
     {
         var result = await authService.ForgotPasswordAsync(forgotPasswordDto);
@@ -55,6 +75,10 @@ public class AuthController(IAuthService authService) : ControllerBase
 
     [HttpPost("reset-password")]
     [EnableRateLimiting("ApiPolicy")]
+    [Consumes("application/json")]
+    [ProducesResponseType(typeof(EmailResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<EmailResponseDto>> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
     {
         var result = await authService.ResetPasswordAsync(resetPasswordDto);

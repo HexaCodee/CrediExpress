@@ -4,16 +4,21 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import swaggerJSDoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import { corsOptions } from './cors.configuration.js';
 import { helmetOptions } from './helmet.configuration.js';
 import { dbConnection } from './db.configuration.js';
 import { requestLimit } from './rateLimit.configuration.js';
+import swaggerOptions from './documentation.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
 import conversionRoutes from '../src/conversions/conversion.routes.js';
 
 const BASE_PATH = '/crediExpress/v1';
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 const routes = (app) => {
+    app.use(`${BASE_PATH}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
     app.use(`${BASE_PATH}/conversions`, conversionRoutes);
 
     app.get(`${BASE_PATH}/health`, (req, res) => {

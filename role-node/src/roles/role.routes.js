@@ -7,10 +7,43 @@ import { check } from 'express-validator';
 
 const router = Router();
 
-// GET
+/**
+ * @swagger
+ * /roles:
+ *   get:
+ *     summary: Lista roles
+ *     tags: [Roles]
+ *     responses:
+ *       200:
+ *         description: Roles obtenidos correctamente
+ */
 router.get('/', getRoles);
 
-// POST:
+/**
+ * @swagger
+ * /roles:
+ *   post:
+ *     summary: Crea un rol
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, description]
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 enum: [CLIENT, BANK_ADMIN, CASHIER]
+ *               description:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Rol creado correctamente
+ */
 router.post('/', [
     validateJWT,
     isAdminRole,
@@ -21,7 +54,35 @@ router.post('/', [
     checkValidators
 ], addRole);
 
-// UPDATE:
+/**
+ * @swagger
+ * /roles/{id}:
+ *   put:
+ *     summary: Actualiza un rol
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Rol actualizado correctamente
+ */
 router.put('/:id', [
     validateJWT,
     isAdminRole,
@@ -37,7 +98,24 @@ router.put('/:id', [
     checkValidators
 ], updateRole);
 
-// DELETE:
+/**
+ * @swagger
+ * /roles/{id}:
+ *   delete:
+ *     summary: Elimina un rol
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Rol eliminado correctamente
+ */
 router.delete('/:id', [
     validateJWT,
     isAdminRole,

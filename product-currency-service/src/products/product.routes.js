@@ -14,18 +14,96 @@ import { checkValidators } from '../../middlewares/check-validators.js';
 
 const router = Router();
 
+/**
+ * @swagger
+ * /products:
+ *   get:
+ *     summary: Lista productos
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: Productos obtenidos correctamente
+ */
 router.get('/', getProducts);
 
+/**
+ * @swagger
+ * /products/code/{code}:
+ *   get:
+ *     summary: Obtiene un producto por codigo
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: code
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Producto obtenido correctamente
+ */
 router.get('/code/:code', [
     check('code', 'El código del producto es obligatorio').not().isEmpty(),
     checkValidators,
 ], getProductByCode);
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Obtiene un producto por id
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Producto obtenido correctamente
+ */
 router.get('/:id', [
     check('id', 'No es un ID válido de MongoDB').isMongoId(),
     checkValidators,
 ], getProductById);
 
+/**
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: Crea un producto
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [code, name, description]
+ *             properties:
+ *               code:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               category:
+ *                 type: string
+ *               minimumOpeningAmount:
+ *                 type: number
+ *               maintenanceFee:
+ *                 type: number
+ *               allowedCurrencies:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       201:
+ *         description: Producto creado correctamente
+ */
 router.post('/', [
     validateJWT,
     isAdminRole,
@@ -42,6 +120,30 @@ router.post('/', [
     checkValidators,
 ], addProduct);
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   put:
+ *     summary: Actualiza un producto
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Producto actualizado correctamente
+ */
 router.put('/:id', [
     validateJWT,
     isAdminRole,
@@ -56,6 +158,24 @@ router.put('/:id', [
     checkValidators,
 ], updateProduct);
 
+/**
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: Elimina un producto
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Producto eliminado correctamente
+ */
 router.delete('/:id', [
     validateJWT,
     isAdminRole,

@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme{
+  --color-main-blue: #08316d;
+}
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+ 
+  --main-blue: #08316d;
+ 
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+ 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+ 
+.animate-fadeIn {
+  animation: fadeIn 0.15s ease-out;
+}
+ 
+.sidebar-underline {
+  position: relative;
+}
+.sidebar-underline.active::after {
+  content: "";
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 6px;
+  height: 5px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    rgba(8, 49, 109, 0.18) 0%,
+    #08316d 50%,
+    rgba(8, 49, 109, 0.18) 100%
+  );
+  filter: blur(1.5px);
+  z-index: 1;
+}
+ 

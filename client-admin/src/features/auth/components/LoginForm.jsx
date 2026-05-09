@@ -1,15 +1,32 @@
 import { useForm } from "react-hook-form"
-
+import { useAuthStore } from "../store/authStore.js";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const LoginForm = ({ onForgot }) => {
+    const navigate = useNavigate();
+    const login = useAuthStore((state) => state.login);
+    const loading = useAuthStore((state) => state.loading);
+    const error = useAuthStore((state) => state.error);
+    
     const {
         register,
-        //    handleSubmit,
+        handleSubmit,
         formState: { errors },
     } = useForm();
 
+    const onSubmit = async (data) => {
+        const res = await login(data);
+        if (res.success) {
+            navigate("/dashboard");
+            toast.success("Inicio de sesión exitoso", { duration: 3000 });
+        } else if (res.error) {
+            toast.error(res.error, { duration: 4000 });
+        }
+    }
+
     return (
-        <form className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
                 <label
                     htmlFor="emailOrUsername"
@@ -58,11 +75,13 @@ export const LoginForm = ({ onForgot }) => {
                     </p>
                 )}
             </div>
+                {error && <p className="text-red-600 text-xs mt-1 text-center">{error}</p>}
             <button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 text-sm"
             >
-                Iniciar sesión
+                {loading ? "Iniciando sesión..." : "Iniciar sesión"}
             </button>
             <p className='text-center text-sm'>
                 <button

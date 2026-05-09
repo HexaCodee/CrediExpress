@@ -50,9 +50,9 @@ public class DataSeeder
                     Id = userId,
                     Name = "Admin Name",
                     Surname = "Admin Surname",
-                    Username = "ADMINB",
+                    Username = "admin",
                     Email = "admin@local.com",
-                    Password = passwordHasher.HashPassword("ADMINB"),
+                    Password = passwordHasher.HashPassword("Informatica2026?"),
                     Status = true,
 
                     UserProfile = new UserProfile

@@ -52,7 +52,22 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddSecurityPolicies(builder.Configuration);
 builder.Services.AddSecurityOptions();
 
+
+//Configure CORS 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
+
+//Use CORS policy
+app.UseCors("CorsPolicy");
 
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())

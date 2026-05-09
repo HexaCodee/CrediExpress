@@ -60,10 +60,10 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
 
     public async Task SendWelcomeEmailAsync(string email, string username)
     {
-        var subject = "¡Bienvenido a Kinal Sports!";
+        var subject = "¡Bienvenido a CrediExpress!";
 
         var body = $@"
-<h2>¡Bienvenido a Kinal Sports, {username}!</h2>
+<h2>¡Bienvenido a CrediExpress, {username}!</h2>
 <p>Tu cuenta ha sido verificada y activada exitosamente.</p>
 <p>Ahora puedes disfrutar de todas las funciones de nuestra plataforma.</p>
 <p>Si tienes alguna pregunta, no dudes en contactar a nuestro equipo de soporte.</p>

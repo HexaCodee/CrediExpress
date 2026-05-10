@@ -82,6 +82,17 @@ public class UserRepository(ApplicationDbContext context) : IUserRepository
         return await GetByIdAsync(user.Id);
     }
 
+    public async Task<IReadOnlyList<User>> GetAllAsync()
+    {
+        return await context.Users
+            .Include(u => u.UserProfile)
+            .Include(u => u.UserEmail)
+            .Include(u => u.UserPasswordReset)
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .ToListAsync();
+    }
+
     public async Task<bool> DeleteAsync(string id)
     {
         var user = await GetByIdAsync(id);

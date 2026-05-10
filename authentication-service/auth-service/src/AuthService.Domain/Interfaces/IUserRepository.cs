@@ -16,5 +16,6 @@ public interface IUserRepository
     Task<bool> ExistsByAccountNumberAsync(string accountNumber);
     Task<User> UpdateAsync(User user);
     Task<bool> DeleteAsync(string id);
+    Task<IReadOnlyList<User>> GetAllAsync();
     Task UpdateUserRoleAsync(string userId, string roleId);
 }

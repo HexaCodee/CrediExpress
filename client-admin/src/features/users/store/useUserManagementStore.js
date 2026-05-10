@@ -58,12 +58,21 @@ export const useUserManagementStore = create((set, get) => ({
     toggleUserStatus: async (user) => {
       try {
         set({ loading: true, error: null });
-        const newStatus = !user.status; // Toggle the status
-        await updateUserRequest(user.id, { status: newStatus });
+        const newStatus = !user.status; 
+
+        set((state) => ({
+          users: state.users.map((u) => u.id === user.id ? { ...u, status: newStatus } : u),
+        }));
+        const formData = new FormData();
+        formData.append('status', newStatus.toString());
+        await updateUserRequest(user.id, formData);
         await get().getAllUsers(undefined, { force: true });
         set({ loading: false });
         return { success: true };
       } catch (err) {
+        set((state) => ({
+          users: state.users.map((u) => u.id === user.id ? { ...u, status: user.status } : u),
+        }));
         const action = user.status ? "deshabilitar" : "habilitar";
         const message =
           err.response?.data?.message || `Error al ${action} el usuario`;

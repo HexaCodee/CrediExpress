@@ -7,10 +7,10 @@ export const DashboardContainer = ({ user, onLogout, children }) => {
 
   return (
     <div
-      className="h-screen w-full overflow-hidden bg-cover bg-center bg-no-repeat"
+      className="h-screen w-full bg-fixed bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${fondoDashboard})` }}
     >
-      <header className="bg-white/95 backdrop-blur-xl shadow-xl border-b border-gray-200">
+      <header className="fixed top-0 left-0 right-0 z-10 bg-white/95 backdrop-blur-xl shadow-xl border-b border-gray-200">
         <div className="w-full px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-2">
@@ -40,8 +40,8 @@ export const DashboardContainer = ({ user, onLogout, children }) => {
         </div>
       </header>
 
-      <div className="flex">
-        <aside className={`${sidebarOpen ? 'block' : 'hidden'} md:block w-64 bg-[#0A1F44] shadow-sm min-h-screen`}>
+      <div className="flex pt-20">
+        <aside className={`${sidebarOpen ? 'block' : 'hidden'} md:block fixed left-0 top-20 bottom-0 w-[200px] bg-[#0A1F44] shadow-sm z-10`}>
           <nav className="mt-8 px-4">
             <ul className="space-y-2">
                             <li>
@@ -53,7 +53,7 @@ export const DashboardContainer = ({ user, onLogout, children }) => {
           </nav>
         </aside>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 md:ml-[200px] p-6 overflow-y-auto">
           {children}
         </main>
       </div>

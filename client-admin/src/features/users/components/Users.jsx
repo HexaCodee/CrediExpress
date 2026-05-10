@@ -7,22 +7,17 @@ import { CreateUserModal } from './CreateUserModal.jsx';
 import { UserDetailModal } from './UserDetailModal.jsx';
 import { showError } from '../../../shared/utils/toast.js';
 import { showSuccess } from '../../../shared/utils/toast.js';
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 5;
 
 export const Users = () => {
-  // Solo lo necesario para listar
   const { users, loading: usersLoading, error: usersError, getAllUsers, updateUser, toggleUserStatus } = useUserManagementStore();
-  // Funcionalidades no necesarias para listar (comentadas)
-  // const { updateUserRole } = useUserManagementStore();
   const registerUser = useAuthStore((state) => state.register);
   const authLoading = useAuthStore((state) => state.loading);
   const authError = useAuthStore((state) => state.error);
   const openConfirm = useUIStore((state) => state.openConfirm);
-  // const currentUser = useAuthStore((state) => state.user);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [page, setPage] = useState(1);
-  // Estados de modales/edición (comentados porque no se usarán por ahora)
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -57,22 +52,6 @@ export const Users = () => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredUsers.slice(start, start + PAGE_SIZE);
   }, [filteredUsers, currentPage]);
-  // Edición de usuario / cambio de rol (comentado)
-  // const handleOpenDetail = (user) => {
-  //   setSelectedUser(user);
-  //   setOpenDetailModal(true);
-  // };
-  // const handleSaveRole = async (user, newRole) => {
-  //   const res = await updateUserRole(user.id, newRole);
-  //   if (res.success) {
-  //     showSuccess("Rol actualizado correctamente");
-  //     setOpenDetailModal(false);
-  //     setSelectedUser(null);
-  //   } else {
-  //     showError(res.error || "Error al actualizar rol");
-  //   }
-  // };
-  // Crear usuario (comentado)
   const handleCreate = async (formData) => {
     const res = await registerUser(formData);
     if (res.success) {
@@ -105,22 +84,19 @@ export const Users = () => {
   const handleToggleUserStatus = (user) => {
     const isCurrentlyEnabled = user.status;
     const action = isCurrentlyEnabled ? 'deshabilitar' : 'habilitar';
-    const newStatus = isCurrentlyEnabled ? 'false' : 'true';
 
     openConfirm({
       title: `${action.charAt(0).toUpperCase() + action.slice(1)} usuario`,
       message: `¿Estás seguro de ${action} a ${user.username}?`,
       onConfirm: async () => {
-        const formData = new FormData();
-        formData.append('status', newStatus);
-        const res = await updateUser(user.id, formData);
+        const res = await toggleUserStatus(user);
         if (res.success) {
           showSuccess(`Usuario ${isCurrentlyEnabled ? 'deshabilitado' : 'habilitado'} correctamente.`);
         } else {
           showError(res.error || `No se pudo ${action} el usuario`);
         }
       },
-      onCancel: () => {},
+      onCancel: () => { },
     });
   };
   if (usersLoading && users.length === 0) return <Spinner />;
@@ -128,30 +104,30 @@ export const Users = () => {
     <div className='p-4'>
       <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-main-blue'>Usuarios</h1>
-          <p className='text-gray-500 text-sm'>
-            Listado de usuarios registrados
+          <h1 className='text-3xl font-semibold text-slate-900'>Usuarios</h1>
+          <p className='text-slate-600 text-sm'>
+            Gestión de usuarios del sistema bancario
           </p>
         </div>
-        {/* Botón para crear usuario (comentado por ahora) */}
 
         <button
-          className='bg-main-blue px-4 py-2 rounded text-white hover:opacity-90 transition'
+          className='bg-slate-900 px-5 py-2.5 rounded-lg text-white hover:bg-slate-800 transition'
           onClick={() => setOpenCreateModal(true)}
         >
-          + Agregar Usuario
+          + Agregar usuario
         </button>
       </div>
-      <div className='bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4'>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-3'>
+
+      <div className='bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-5'>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
           <input
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(1);
             }}
-            placeholder='Buscar por nombre o username...'
-            className='md:col-span-2 w-full px-3 py-2 border rounded-lg'
+            placeholder='Buscar por nombre o usuario'
+            className='md:col-span-2 w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-slate-600 focus:ring-1 focus:ring-slate-300 outline-none'
           />
           <select
             value={roleFilter}
@@ -159,7 +135,7 @@ export const Users = () => {
               setRoleFilter(e.target.value);
               setPage(1);
             }}
-            className='w-full px-3 py-2 border rounded-lg'
+            className='w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-slate-600 focus:ring-1 focus:ring-slate-300 outline-none'
           >
             <option value='ALL'>Todos los roles</option>
             <option value='ADMIN_ROLE'>ADMIN_ROLE</option>
@@ -167,91 +143,88 @@ export const Users = () => {
           </select>
         </div>
       </div>
-      <div className='bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden'>
+
+      <div className='bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden'>
         <div className='overflow-x-auto'>
-          <table className='min-w-full text-sm'>
-            <thead className='bg-gray-50 text-gray-700'>
-              <tr>
-                <th className='text-left px-4 py-3'>Nombre</th>
-                <th className='text-left px-4 py-3'>Username</th>
-                <th className='text-left px-4 py-3'>Rol</th>
-              <th className='text-right px-4 py-3'>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedUsers.length === 0 ? (
+          <div className='max-h-[720px] overflow-y-auto'>
+            <table className='min-w-full text-sm'>
+              <thead className='bg-[#0A1F44] text-white uppercase tracking-[0.05em] text-xs'>
                 <tr>
-                  <td
-                    className='px-4 py-6 text-center text-gray-500'
-                    // colSpan={4}
-                    colSpan={3}
-                  >
-                    No hay usuarios para mostrar.
-                  </td>
+                  <th className='text-left px-5 py-4 font-medium'>Nombre</th>
+                  <th className='text-left px-5 py-4 font-medium'>Username</th>
+                  <th className='text-left px-5 py-4 font-medium'>Rol</th>
+                  <th className='text-right px-5 py-4 font-medium'>Acciones</th>
                 </tr>
-              ) : (
-                paginatedUsers.map((u) => (
-                  <tr key={u.id} className='border-t hover:bg-gray-50'>
-                    <td className='px-4 py-3 font-medium text-gray-800'>
-                      {[u.name, u.surname].filter(Boolean).join(' ') || '-'}
-                    </td>
-                    <td className='px-4 py-3 text-gray-700'>@{u.username}</td>
-                    <td className='px-4 py-3'>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          u.role === 'ADMIN_ROLE'
-                            ? 'bg-blue-100 text-blue-700'
-                            : 'bg-gray-100 text-gray-700'
-                        }`}
-                      >
-                        {u.role}
-                      </span>
-                    </td>
-                    <td className='px-4 py-3 text-right space-x-2'>
-                      <button
-                        onClick={() => handleOpenDetail(u)}
-                        className='px-3 py-1.5 rounded-lg bg-main-blue text-white text-xs font-semibold hover:opacity-90'
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleToggleUserStatus(u)}
-                        className={`px-3 py-1.5 rounded-lg text-white text-xs font-semibold hover:opacity-90 ${
-                          u.status ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'
-                        }`}
-                      >
-                        {u.status ? 'Deshabilitar' : 'Habilitar'}
-                      </button>
+              </thead>
+              <tbody>
+                {paginatedUsers.length === 0 ? (
+                  <tr>
+                    <td className='px-4 py-6 text-center text-gray-500' colSpan={4}>
+                      No hay usuarios para mostrar.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  paginatedUsers.map((u) => (
+                    <tr key={u.id} className='border-t hover:bg-gray-50'>
+                      <td className='px-4 py-3 font-medium text-gray-800'>
+                        {[u.name, u.surname].filter(Boolean).join(' ') || '-'}
+                      </td>
+                      <td className='px-4 py-3 text-gray-700'>@{u.username}</td>
+                      <td className='px-5 py-4'>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${u.role === 'ADMIN_ROLE'
+                              ? 'bg-[#0A1F44] text-white'
+                              : 'bg-[#0A1F44] text-white'
+                            }`}
+                        >
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className='px-5 py-4 text-right space-x-2'>
+                        <button
+                          onClick={() => handleOpenDetail(u)}
+                          className='w-24 px-3 py-2 rounded-lg bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700 transition'
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleToggleUserStatus(u)}
+                          className={`w-28 px-3 py-2 rounded-lg text-white text-xs font-semibold hover:opacity-95 transition ${u.status ? 'bg-slate-700 hover:bg-slate-800' : 'bg-slate-500 hover:bg-slate-600'
+                            }`}
+                        >
+                          {u.status ? 'Deshabilitar' : 'Habilitar'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className='flex items-center justify-between px-4 py-3 border-t bg-gray-50'>
-          <p className='text-xs text-gray-600'>
+        <div className='flex flex-col md:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-slate-200 bg-slate-50'>
+          <p className='text-xs text-slate-600'>
             Mostrando{' '}
             {(currentPage - 1) * PAGE_SIZE + (paginatedUsers.length ? 1 : 0)}
             {' - '}
             {(currentPage - 1) * PAGE_SIZE + paginatedUsers.length} de{' '}
             {filteredUsers.length}
           </p>
-          <div className='flex gap-2'>
+          <div className='flex items-center gap-2'>
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className='px-3 py-1.5 rounded border bg-white text-sm disabled:opacity-50'
+              className='px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-400'
             >
               Anterior
             </button>
-            <span className='px-2 py-1.5 text-sm text-gray-700'>
+            <span className='px-3 py-2 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg'>
               {currentPage} / {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className='px-3 py-1.5 rounded border bg-white text-sm disabled:opacity-50'
+              className='px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-400'
             >
               Siguiente
             </button>

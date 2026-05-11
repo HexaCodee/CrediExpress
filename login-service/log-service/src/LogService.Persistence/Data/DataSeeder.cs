@@ -34,25 +34,31 @@ public class DataSeeder
             await context.SaveChangesAsync();
         }
 
-        if(!await context.Users.AnyAsync())
+        var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == RoleConstants.BANK_ADMIN);
+        if (adminRole != null)
         {
-            var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == RoleConstants.BANK_ADMIN);
-            if(adminRole != null)
+            var passwordHasher = new PasswordHashService();
+            var adminUser = await context.Users
+                .Include(u => u.UserProfile)
+                .Include(u => u.UserEmail)
+                .Include(u => u.UserRoles)
+                .FirstOrDefaultAsync(u => u.Username == "ADMINB" || u.Email == "admin@local.com");
+
+            if (adminUser == null && !await context.Users.AnyAsync())
             {
-                var passwordHasher = new PasswordHashService();
                 var userId = UuidGenerator.GenerateUserId();
                 var profileId = UuidGenerator.GenerateUserId();
                 var emailId = UuidGenerator.GenerateUserId();
                 var userRoleId = UuidGenerator.GenerateUserId();
 
-                var adminUser = new User
+                adminUser = new User
                 {
                     Id = userId,
                     Name = "Admin Name",
                     Surname = "Admin Surname",
-                    Username = "admin",
+                    Username = "ADMINB",
                     Email = "admin@local.com",
-                    Password = passwordHasher.HashPassword("Informatica2026?"),
+                    Password = passwordHasher.HashPassword("ADMINB"),
                     Status = true,
 
                     UserProfile = new UserProfile
@@ -78,13 +84,36 @@ public class DataSeeder
                         {
                             Id = userRoleId,
                             UserId = userId,
-                            RoleId = adminRole.Id    
+                            RoleId = adminRole.Id
                         }
                     ]
                 };
+
                 await context.Users.AddAsync(adminUser);
-                await context.SaveChangesAsync();
             }
+            else if (adminUser != null)
+            {
+                adminUser.Username = "ADMINB";
+                adminUser.Password = passwordHasher.HashPassword("ADMINB");
+                adminUser.Status = true;
+
+                if (adminUser.UserEmail != null)
+                {
+                    adminUser.UserEmail.EmailVerified = true;
+                }
+
+                if (!adminUser.UserRoles.Any(r => r.RoleId == adminRole.Id))
+                {
+                    adminUser.UserRoles.Add(new UserRole
+                    {
+                        Id = UuidGenerator.GenerateUserId(),
+                        UserId = adminUser.Id,
+                        RoleId = adminRole.Id
+                    });
+                }
+            }
+
+            await context.SaveChangesAsync();
         }
     }
 }

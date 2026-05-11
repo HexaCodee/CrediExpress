@@ -23,8 +23,9 @@
 
 ## [Configuration Files - SENSITIVE]
 **/secret.json
-.env
-appsettings.json
+# Ignore dotenv and appsettings files
+*.env
+appsettings*.json
 pg/
 
 ## [Logs]

@@ -20,6 +20,20 @@ public class UserProfile
     [RegularExpression(@"^\d{8}$", ErrorMessage = "El teléfono debe contener solo números.")]
     public string Phone {get; set;} = string.Empty;
 
+    [MaxLength(50)]
+    public string AccountNumber {get; set;} = string.Empty;
+
+    [MaxLength(20)]
+    public string Dpi {get; set;} = string.Empty;
+
+    [MaxLength(255)]
+    public string Address {get; set;} = string.Empty;
+
+    [MaxLength(100)]
+    public string JobName {get; set;} = string.Empty;
+
+    public decimal MonthlyIncome {get; set;} = 0;
+
     public DateTime CreatedAt {get; set;} = DateTime.UtcNow;
     public DateTime UpdatedAt {get; set;} = DateTime.UtcNow;
 

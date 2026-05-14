@@ -13,6 +13,7 @@ import { requestLimit } from './rateLimit.configuration.js';
 import swaggerOptions from './documentation.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
 import accountRoutes from '../src/accounts/account.routes.js';
+import clientRoutes from '../src/clients/client.routes.js';
 
 const BASE_PATH = '/crediExpress/v1';
 const swaggerDocs = swaggerJSDoc(swaggerOptions);
@@ -20,6 +21,7 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions);
 const routes = (app) => {
     app.use(`${BASE_PATH}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
     app.use(`${BASE_PATH}/accounts`, accountRoutes);
+    app.use(`${BASE_PATH}/clients`, clientRoutes);
 
     app.get(`${BASE_PATH}/health`, (req, res) => {
         res.status(200).json({

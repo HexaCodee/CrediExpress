@@ -9,6 +9,10 @@ public class DataSeeder
 {
     public static async Task SeedAsync(ApplicationDbContext context)
     {
+        const string adminUsername = "adminb";
+        const string adminEmail = "adminb@local.com";
+        const string adminPassword = "adminb";
+
         if (!context.Roles.Any())
         {
             var roles = new List<Role>
@@ -34,57 +38,78 @@ public class DataSeeder
             await context.SaveChangesAsync();
         }
 
-        if(!await context.Users.AnyAsync())
+        var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == RoleConstants.BANK_ADMIN);
+        if (adminRole == null)
         {
-            var adminRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == RoleConstants.BANK_ADMIN);
-            if(adminRole != null)
-            {
-                var passwordHasher = new PasswordHashService();
-                var userId = UuidGenerator.GenerateUserId();
-                var profileId = UuidGenerator.GenerateUserId();
-                var emailId = UuidGenerator.GenerateUserId();
-                var userRoleId = UuidGenerator.GenerateUserId();
-
-                var adminUser = new User
-                {
-                    Id = userId,
-                    Name = "Admin Name",
-                    Surname = "Admin Surname",
-                    Username = "admin",
-                    Email = "admin@local.com",
-                    Password = passwordHasher.HashPassword("Informatica2026?"),
-                    Status = true,
-
-                    UserProfile = new UserProfile
-                    {
-                        Id = profileId,
-                        UserId = userId,
-                        ProfilePicture = string.Empty,
-                        Phone = "00000000"
-                    },
-
-                    UserEmail = new UserEmail
-                    {
-                        Id = emailId,
-                        UserId = userId,
-                        EmailVerified = true,
-                        EmailVerificationToken = null,
-                        EmailVerificationTokenExpiry = null
-                    },
-
-                    UserRoles =
-                    [
-                        new UserRole
-                        {
-                            Id = userRoleId,
-                            UserId = userId,
-                            RoleId = adminRole.Id    
-                        }
-                    ]
-                };
-                await context.Users.AddAsync(adminUser);
-                await context.SaveChangesAsync();
-            }
+            return;
         }
+
+        var adminUser = await context.Users.FirstOrDefaultAsync(u => u.Username == adminUsername || u.Email == adminEmail);
+        var oldAdmin = await context.Users.FirstOrDefaultAsync(u => u.Username == "admin" || u.Email == "admin@local.com");
+
+        var passwordHasher = new PasswordHashService();
+
+        // Remove old admin if exists
+        if (oldAdmin != null)
+        {
+            context.Users.Remove(oldAdmin);
+            await context.SaveChangesAsync();
+        }
+
+        // Remove new admin if already exists (to recreate it fresh)
+        if (adminUser != null)
+        {
+            context.Users.Remove(adminUser);
+            await context.SaveChangesAsync();
+        }
+
+        // Create fresh admin
+        var userId = UuidGenerator.GenerateUserId();
+        var profileId = UuidGenerator.GenerateUserId();
+        var emailId = UuidGenerator.GenerateUserId();
+        var userRoleId = UuidGenerator.GenerateUserId();
+
+        var newAdmin = new User
+        {
+            Id = userId,
+            Name = "Admin B",
+            Surname = "Admin B",
+            Username = adminUsername,
+            Email = adminEmail,
+            Password = passwordHasher.HashPassword(adminPassword),
+            Status = true,
+            UserProfile = new UserProfile
+            {
+                Id = profileId,
+                UserId = userId,
+                ProfilePicture = string.Empty,
+                Phone = "00000000",
+                AccountNumber = string.Empty,
+                Dpi = string.Empty,
+                Address = string.Empty,
+                JobName = string.Empty,
+                MonthlyIncome = 100
+            },
+            UserEmail = new UserEmail
+            {
+                Id = emailId,
+                UserId = userId,
+                EmailVerified = true,
+                EmailVerificationToken = null,
+                EmailVerificationTokenExpiry = null
+            },
+            UserRoles =
+            [
+                new UserRole
+                {
+                    Id = userRoleId,
+                    UserId = userId,
+                    RoleId = adminRole.Id
+                }
+            ]
+        };
+
+        await context.Users.AddAsync(newAdmin);
+        await context.SaveChangesAsync();
     }
 }

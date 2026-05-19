@@ -24,7 +24,9 @@ export const DashboardContainer = ({ user, onLogout, children }) => {
               </button>
               <img src={logo} alt="CrediExpress logo" className="h-12 w-auto rounded-full border border-gray-200" />
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-[0.18em]">Panel administrativo</p>
+                <p className="text-xs text-gray-500 uppercase tracking-[0.18em]">
+                  {user?.role === 'BANK_ADMIN' ? 'Panel administrativo' : 'Panel de usuario'}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -44,11 +46,19 @@ export const DashboardContainer = ({ user, onLogout, children }) => {
         <aside className={`${sidebarOpen ? 'block' : 'hidden'} md:block w-64 bg-[#0A1F44] shadow-sm min-h-screen`}>
           <nav className="mt-8 px-4">
             <ul className="space-y-2">
-                            <li>
-                <a href="/dashboard/users" className="block px-4 py-2 text-md text-white hover:bg-[#0A1F44]/80 rounded-md transition">
-                  Usuarios
-                </a>
-              </li>
+              {user?.role === 'BANK_ADMIN' ? (
+                <li>
+                  <a href="/dashboard/users" className="block px-4 py-2 text-md text-white hover:bg-[#0A1F44]/80 rounded-md transition">
+                    Usuarios
+                  </a>
+                </li>
+              ) : (
+                <li>
+                  <a href="/dashboard/user" className="block px-4 py-2 text-md text-white hover:bg-[#0A1F44]/80 rounded-md transition">
+                    Mi panel
+                  </a>
+                </li>
+              )}
             </ul>
           </nav>
         </aside>

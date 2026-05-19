@@ -9,9 +9,9 @@ public class DataSeeder
 {
     public static async Task SeedAsync(ApplicationDbContext context)
     {
-        const string adminUsername = "adminb";
-        const string adminEmail = "adminb@gmail.com";
-        const string adminPassword = "adminb";
+        const string adminUsername = "ADMINB";
+        const string adminEmail = "ADMINB@gmail.com";
+        const string adminPassword = "ADMINB";
 
         if (!context.Roles.Any())
         {

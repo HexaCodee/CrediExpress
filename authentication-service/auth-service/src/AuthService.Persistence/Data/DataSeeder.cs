@@ -84,7 +84,7 @@ public class DataSeeder
                 UserId = userId,
                 ProfilePicture = string.Empty,
                 Phone = "00000000",
-                AccountNumber = string.Empty,
+                AccountNumber = UuidGenerator.GenerateShortUUID(),
                 Dpi = string.Empty,
                 Address = string.Empty,
                 JobName = string.Empty,

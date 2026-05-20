@@ -63,9 +63,9 @@ export const useUserManagementStore = create((set, get) => ({
         set((state) => ({
           users: state.users.map((u) => u.id === user.id ? { ...u, status: newStatus } : u),
         }));
-        const formData = new FormData();
-        formData.append('status', newStatus.toString());
-        await updateUserRequest(user.id, formData);
+        await updateUserRequest(user.id, {
+  status: newStatus
+});
         await get().getAllUsers(undefined, { force: true });
         set({ loading: false });
         return { success: true };

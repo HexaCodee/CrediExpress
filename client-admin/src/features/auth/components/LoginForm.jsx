@@ -36,7 +36,7 @@ export const LoginForm = ({ onForgot }) => {
             <div>
                 <label
                     htmlFor="emailOrUsername"
-                    className="block text-sm font-medium text-gray-800 mb-1.5"
+                    className="block text-sm font-medium text-white mb-1.5"
                 >
                    Usuario o correo
                 </label>
@@ -44,7 +44,7 @@ export const LoginForm = ({ onForgot }) => {
                     type="text"
                     id="emailOrUsername"
                     placeholder="Correo electrónico o usuario"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm bg-transparent text-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 placeholder:text-slate-400"
                     {
                     ...register("emailOrUsername", {
                         required: "Este campo es obligatorio",
@@ -60,7 +60,7 @@ export const LoginForm = ({ onForgot }) => {
             <div>
                 <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-gray-800 mb-1.5"
+                    className="block text-sm font-medium text-white mb-1.5 text-white"
                 >
                     Contraseña
                 </label>
@@ -68,7 +68,7 @@ export const LoginForm = ({ onForgot }) => {
                     type="password"
                     id="password"
                     placeholder="° ° ° ° ° ° ° °"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm  border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 placeholder:text-slate-400 bg-transparent text-white"
                     {
                     ...register("password", {
                         required: "Este campo es obligatorio",
@@ -93,9 +93,9 @@ export const LoginForm = ({ onForgot }) => {
                 <button
                     type='button'
                     onClick={onForgot}
-                    className='text-main-blue hover:underline hover:cursor-pointer'
+                    className='text-white hover:underline hover:cursor-pointer'
                 >
-                    ¿Olvidaste tu contraseña?
+                    ¿Olvidaste tu <span className='text-red-600 font-bold'>contraseña</span>?
                 </button>
             </p>
         </form>

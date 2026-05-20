@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
 import { useUserManagementStore } from '../store/useUserManagementStore.js';
 import { useAuthStore } from '../../auth/store/authStore.js';
 import { useUIStore } from '../../auth/store/uiStore.js';
@@ -21,6 +22,24 @@ export const Users = () => {
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [newUserData, setNewUserData] = useState({
+    name: '',
+    surname: '',
+    username: '',
+    phone: '',
+    dpi: '',
+    address: '',
+    jobTitle: '',
+    monthlyIncome: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    profilePhoto: '',
+    role: 'USER_ROLE',
+  });
+  const [newUserError, setNewUserError] = useState('');
+  const [newUserSuccess, setNewUserSuccess] = useState('');
+  const [systemActivities, setSystemActivities] = useState([]);
   useEffect(() => {
     getAllUsers();
   }, [getAllUsers]);
@@ -52,6 +71,10 @@ export const Users = () => {
     const start = (currentPage - 1) * PAGE_SIZE;
     return filteredUsers.slice(start, start + PAGE_SIZE);
   }, [filteredUsers, currentPage]);
+
+  const totalUsers = filteredUsers.length;
+  const activeCount = filteredUsers.filter((u) => u.status).length;
+  const inactiveCount = totalUsers - activeCount;
   const handleCreate = async (formData) => {
     const res = await registerUser(formData);
     if (res.success) {
@@ -64,6 +87,44 @@ export const Users = () => {
     return false;
   };
 
+  const handleInlineCreate = async (event) => {
+    event.preventDefault();
+    setNewUserError('');
+    setNewUserSuccess('');
+
+    if (!newUserData.name || !newUserData.username || !newUserData.email || !newUserData.password) {
+      setNewUserError('Debe completar los campos obligatorios.');
+      return;
+    }
+
+    if (newUserData.password !== newUserData.confirmPassword) {
+      setNewUserError('Las contraseñas no coinciden.');
+      return;
+    }
+
+    const res = await handleCreate(newUserData);
+    if (res) {
+      setNewUserData({
+        name: '',
+        surname: '',
+        username: '',
+        phone: '',
+        dpi: '',
+        address: '',
+        jobTitle: '',
+        monthlyIncome: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        profilePhoto: '',
+        role: 'USER_ROLE',
+      });
+      setNewUserSuccess('Usuario agregado correctamente.');
+    } else {
+      setNewUserError('No se pudo agregar el usuario. Revisa los datos.');
+    }
+  };
+
   const handleOpenDetail = (user) => {
     setSelectedUser(user);
     setOpenEditModal(true);
@@ -72,6 +133,20 @@ export const Users = () => {
   const handleSaveUser = async (userId, formData) => {
     const res = await updateUser(userId, formData);
     if (res.success) {
+      const updatedUser = {
+        ...(selectedUser || {}),
+        role: formData.get('role') || selectedUser?.role,
+      };
+      setSystemActivities((prev) => [
+        {
+          user: updatedUser,
+          action: 'Perfil modificado',
+          actionColor: 'text-emerald-400',
+          time: new Date().toLocaleString(),
+        },
+        ...prev,
+      ].slice(0, 10));
+
       showSuccess('Usuario actualizado correctamente.');
       setOpenEditModal(false);
       setSelectedUser(null);
@@ -99,101 +174,219 @@ export const Users = () => {
       onCancel: () => { },
     });
   };
+
+  const getRecentActivities = () => {
+    return users.slice().reverse().slice(0, 5).map((u) => ({
+      user: u,
+      action: u.status ? 'Cuenta activa' : 'Cuenta inactiva',
+      actionColor: u.status ? 'text-emerald-400' : 'text-slate-500',
+      time: 'Recientemente',
+    }));
+  };
+
+  const recentActivities = getRecentActivities();
+
+  useEffect(() => {
+    setSystemActivities(getRecentActivities());
+  }, [users]);
+
+  const getAvatarColor = (index) => {
+    const colors = ['bg-blue-600', 'bg-purple-600', 'bg-pink-600', 'bg-orange-600', 'bg-green-600'];
+    return colors[index % colors.length];
+  };
   if (usersLoading && users.length === 0) return <Spinner />;
   return (
     <div className='p-4'>
-      <div className='flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6'>
+      <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6'>
         <div>
-          <h1 className='text-3xl font-semibold text-slate-900'>Usuarios</h1>
-          <p className='text-slate-600 text-sm'>
-            Gestión de usuarios del sistema bancario
-          </p>
+          <h1 className='text-3xl font-semibold text-white'>Usuarios</h1>
+          <p className='text-sm text-slate-300'>Gestión de usuarios</p>
         </div>
-
         <button
-          className='bg-slate-900 px-5 py-2.5 rounded-lg text-white hover:bg-slate-800 transition'
+          type='button'
           onClick={() => setOpenCreateModal(true)}
+          className='bg-red-600 hover:bg-red-800 text-white rounded-lg px-5 py-3 text-sm font-medium transition'
         >
           + Agregar usuario
         </button>
       </div>
+     <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6'>
 
-      <div className='bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-5'>
-        <div className='grid grid-cols-1 lg:grid-cols-3 gap-4'>
-          <input
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setPage(1);
-            }}
-            placeholder='Buscar por nombre o usuario'
-            className='md:col-span-2 w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-slate-600 focus:ring-1 focus:ring-slate-300 outline-none'
-          />
-          <select
-            value={roleFilter}
-            onChange={(e) => {
-              setRoleFilter(e.target.value);
-              setPage(1);
-            }}
-            className='w-full px-4 py-3 border border-slate-300 rounded-xl focus:border-slate-600 focus:ring-1 focus:ring-slate-300 outline-none'
-          >
-            <option value='ALL'>Todos los roles</option>
-            <option value='ADMIN_ROLE'>ADMIN_ROLE</option>
-            <option value='USER_ROLE'>USER_ROLE</option>
-          </select>
+  <div className='lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4'>
+    <div className='bg-white/5 rounded-xl p-6 h-80 flex flex-col items-center justify-center text-center'>
+      <span className='text-lg text-slate-300'>Usuarios totales</span>
+      <span className='text-3xl font-bold text-white'>{totalUsers}</span>
+      <span className='text-xs text-slate-400 mt-2'>Total de usuarios</span>
+    </div>
+    <div className='bg-white/5 rounded-xl p-6 h-80 flex flex-col items-center justify-center text-center'>
+      <span className='text-lg text-slate-300'>Activos</span>
+      <span className='text-3xl font-bold text-white'>{activeCount}</span>
+      <span className='text-xs text-slate-400 mt-2'>
+        +{Math.max(0, activeCount)} hoy
+      </span>
+    </div>
+    <div className='bg-white/5 rounded-xl p-6 h-80 flex flex-col items-center justify-center text-center'>
+      <span className='text-lg text-slate-300'>Inactivos</span>
+      <span className='text-3xl font-bold text-white'>{inactiveCount}</span>
+      <span className='text-xs text-slate-400 mt-2'>
+        -{Math.max(0, inactiveCount)} hoy
+      </span>
+    </div>
+
+  </div>
+  <div className='hidden lg:flex flex-col gap-4'>
+    <div className='bg-white/5 rounded-xl p-4 h-full flex flex-col'>
+      <h3 className='text-sm text-slate-300 mb-4 text-center'>
+        Actividad reciente
+      </h3>
+      <ul className='text-sm text-slate-200 space-y-4 overflow-y-auto'>
+
+        {recentActivities.map((activity, idx) => (
+          <li key={`${activity.user.id}-${idx}`} className='flex items-center gap-3'>
+
+            <div className={`h-8 w-8 rounded-full ${getAvatarColor(idx)} flex items-center justify-center text-xs text-white font-semibold flex-shrink-0`}>
+              {activity.user.name
+                ? activity.user.name.charAt(0).toUpperCase()
+                : 'U'}
+            </div>
+            <div className='flex-1 min-w-0 text-center'>
+              <div className='text-sm font-semibold text-white truncate'>
+                {activity.user.name || activity.user.username}
+              </div>
+              <div className={`text-xs ${activity.actionColor}`}>
+                {activity.action}
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6'>
+        <div className='lg:col-span-2 bg-white/5 rounded-2xl p-4'>
+          <h3 className='text-sm text-slate-300 mb-4'>Clientes activos vs inactivos</h3>
+          <div className='h-76 rounded-lg bg-gradient-to-b  flex items-center justify-center'>
+            {totalUsers > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={[
+                      { name: 'Activos', value: activeCount, fill: '#ff0101' },
+                      { name: 'Inactivos', value: inactiveCount, fill: '#6b7280' }
+                    ]}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={50}
+                    outerRadius={80}
+                    dataKey="value"
+                    label={({ name, value, percent }) =>
+                      `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                    }
+                    labelLine={{ stroke: '#ffffff' }}
+                  >
+                    <Cell fill="#ff0101" />
+                    <Cell fill="#ffffff" />
+                  </Pie>
+
+                  <Tooltip
+                    formatter={(value) => value}
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: '1px solid #374151',
+                      borderRadius: '0.5rem',
+                      color: '#ffffff'
+                    }}
+                    labelStyle={{ color: '#ffffff' }}
+                  />
+
+                  <Legend
+                    align='left'
+                    verticalAlign='top'
+                    wrapperStyle={{
+                      color: '#ffffff'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className='text-slate-400'>No hay datos disponibles</div>
+            )}
+          </div>
+        </div>
+        <div className='bg-white/5 rounded-2xl p-4'>
+          <h3 className='text-sm text-slate-300 mb-4'>Actividad reciente del sistema</h3>
+          <div className='space-y-3 text-sm text-slate-200'>
+            {systemActivities.map((activity, idx) => (
+              <div key={`${activity.user.id}-${idx}`} className='flex items-center justify-between p-2 rounded hover:bg-white/5 transition'>
+                <div className='flex items-center gap-3 flex-1 min-w-0'>
+                  <div className={`h-8 w-8 rounded-full ${getAvatarColor(idx)} flex items-center justify-center text-xs text-white font-semibold flex-shrink-0`}>
+                    {activity.user.name ? activity.user.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                  <div className='flex-1 min-w-0'>
+                    <div className='font-semibold truncate'>{activity.user.name || activity.user.username}</div>
+                    <div className={`text-xs ${activity.actionColor}`}>{activity.action}</div>
+                  </div>
+                </div>
+                <div className='text-xs text-slate-500 flex-shrink-0 ml-2'>{activity.time}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className='bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden'>
+      <div className='bg-transparent rounded-2xl border border-gray-900 shadow-sm overflow-hidden'>
         <div className='overflow-x-auto'>
           <div className='max-h-[720px] overflow-y-auto'>
             <table className='min-w-full text-sm'>
               <thead className='bg-[#0A1F44] text-white uppercase tracking-[0.05em] text-xs'>
                 <tr>
-                  <th className='text-left px-5 py-4 font-medium'>Nombre</th>
-                  <th className='text-left px-5 py-4 font-medium'>Username</th>
-                  <th className='text-left px-5 py-4 font-medium'>Rol</th>
-                  <th className='text-right px-5 py-4 font-medium'>Acciones</th>
+                  <th className='text-left px-5 py-4 font-medium text-white'>Nombre</th>
+                  <th className='text-left px-5 py-4 font-medium text-white'>Username</th>
+                  <th className='text-left px-5 py-4 font-medium text-white'>Rol</th>
+                  <th className='text-center px-5 py-4 font-medium text-white'>Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedUsers.length === 0 ? (
                   <tr>
-                    <td className='px-4 py-6 text-center text-gray-500' colSpan={4}>
+                    <td className='px-4 py-6 text-center text-white' colSpan={4}>
                       No hay usuarios para mostrar.
                     </td>
                   </tr>
                 ) : (
                   paginatedUsers.map((u) => (
-                    <tr key={u.id} className='border-t hover:bg-gray-50'>
-                      <td className='px-4 py-3 font-medium text-gray-800'>
+                    <tr key={u.id} className='border-t border-gray-900 hover:bg-gray-500'>
+                      <td className='px-4 py-3 font-medium text-white text-left'>
                         {[u.name, u.surname].filter(Boolean).join(' ') || '-'}
                       </td>
-                      <td className='px-4 py-3 text-gray-700'>@{u.username}</td>
-                      <td className='px-5 py-4'>
+                      <td className='px-4 py-3 text-white text-left'>@{u.username}</td>
+                      <td className='px-4 py-3 text-left'>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-semibold ${u.role === 'ADMIN_ROLE'
-                              ? 'bg-[#0A1F44] text-white'
-                              : 'bg-[#0A1F44] text-white'
+                            ? 'bg-[#0A1F44] text-white'
+                            : 'bg-[#0A1F44] text-white'
                             }`}
                         >
                           {u.role}
                         </span>
                       </td>
-                      <td className='px-5 py-4 text-right space-x-2'>
-                        <button
-                          onClick={() => handleOpenDetail(u)}
-                          className='w-24 px-3 py-2 rounded-lg bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700 transition'
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleToggleUserStatus(u)}
-                          className={`w-28 px-3 py-2 rounded-lg text-white text-xs font-semibold hover:opacity-95 transition ${u.status ? 'bg-slate-700 hover:bg-slate-800' : 'bg-slate-500 hover:bg-slate-600'
-                            }`}
-                        >
-                          {u.status ? 'Deshabilitar' : 'Habilitar'}
-                        </button>
+                      <td className='px-5 py-4 text-center'>
+                        <div className='inline-flex items-center justify-center gap-2'>
+                          <button
+                            onClick={() => handleOpenDetail(u)}
+                            className='w-24 px-3 py-2 rounded-lg bg-slate-800 text-white text-xs font-semibold hover:bg-slate-700 transition'
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleToggleUserStatus(u)}
+                            className={`w-28 px-3 py-2 rounded-lg text-white text-xs font-semibold hover:opacity-95 transition ${u.status ? 'bg-slate-700 hover:bg-slate-800' : 'bg-slate-500 hover:bg-slate-600'
+                              }`}
+                          >
+                            {u.status ? 'Deshabilitar' : 'Habilitar'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -202,8 +395,8 @@ export const Users = () => {
             </table>
           </div>
         </div>
-        <div className='flex flex-col md:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-slate-200 bg-slate-50'>
-          <p className='text-xs text-slate-600'>
+        <div className='flex flex-col md:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-gray-900 bg-transparent'>
+          <p className='text-xs text-slate-200'>
             Mostrando{' '}
             {(currentPage - 1) * PAGE_SIZE + (paginatedUsers.length ? 1 : 0)}
             {' - '}
@@ -214,17 +407,17 @@ export const Users = () => {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className='px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-400'
+              className='px-3 py-2 rounded-lg border border-gray-900 bg-gray-900 text-sm text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-700'
             >
               Anterior
             </button>
-            <span className='px-3 py-2 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg'>
+            <span className='px-3 py-2 text-sm text-slate-200 bg-gray-900 border border-gray-900 rounded-lg'>
               {currentPage} / {totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className='px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm text-slate-700 disabled:opacity-50 disabled:cursor-not-allowed hover:border-slate-400'
+              className='px-3 py-2 rounded-lg border border-gray-900 bg-gray-900 text-sm text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed hover:border-gray-700'
             >
               Siguiente
             </button>

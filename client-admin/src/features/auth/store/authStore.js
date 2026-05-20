@@ -16,10 +16,8 @@ export const useAuthStore = create(
             isAuthenticated: false,
             checkAuth: () => {
                 const token = get().token;
-                const role = get().user?.role;
-                const isAdmin = role === "BANK_ADMIN";
 
-                if (!token || !isAdmin) {
+                if (!token) {
                     set({
                         user: null,
                         token: null,
@@ -27,7 +25,7 @@ export const useAuthStore = create(
                         expiresAt: null,
                         isLoadingAuth: false,
                         isAuthenticated: false,
-                        error: token ? "Usuario no autorizado" : null,
+                        error: null,
                     });
                     return;
                 }
@@ -65,24 +63,7 @@ export const useAuthStore = create(
                         throw new Error("Respuesta inválida del servicio de autenticación");
                     }
                     //------------------------------------------------------------------------------------
-                    const role = user?.role;
-                    if (role !== "BANK_ADMIN") {
-                        const message = "Usuario no autorizado";
-
-                        set({
-                            user: null,
-                            token: null,
-                            refreshToken: null,
-                            expiresAt: null,
-                            isLoadingAuth: false,
-                            isAuthenticated: false,
-                            error: message,
-                            loading: false,
-                        });
-
-                        showError(message);
-                        return { success: false, error: message };
-                    }
+                    // Allow any authenticated role. Routing and UI will adapt based on `user.role`.
 
                     const expiresIn = Number(data.expiresIn);
                     const expiresAt = Number.isFinite(expiresIn) && expiresIn > 0
@@ -126,5 +107,16 @@ export const useAuthStore = create(
                     return { success: false, error: message };
                 }
             }
-        })),
+        }),
+        {
+            name: 'auth',
+            partialize: (state) => ({
+                user: state.user,
+                token: state.token,
+                refreshToken: state.refreshToken,
+                expiresAt: state.expiresAt,
+                isAuthenticated: state.isAuthenticated,
+            }),
+        }
+    )
 );

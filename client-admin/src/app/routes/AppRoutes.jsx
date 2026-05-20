@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { AuthPage } from '../../features/auth/pages/AuthPage.jsx';
 import { DashboardPage } from '../layouts/DashboardPage.jsx';
+import { UserPanel } from '../../features/auth/components/UserPanel.jsx';
 import { ProtectedRoutes } from './ProtectedRoutes.jsx';
 import { UnauthorizedPage } from '../../features/auth/pages/UnauthorizedPage.jsx';
 import { Users } from '../../features/users/components/Users.jsx';
@@ -19,6 +20,7 @@ export const AppRoutes = () => {
                 }
             >
                 <Route path='users' element={<Users />} />
+                <Route path='user' element={<UserPanel />} />
             </Route>
         </Routes>
     )

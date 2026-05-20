@@ -18,7 +18,13 @@ export const LoginForm = ({ onForgot }) => {
     const onSubmit = async (data) => {
         const res = await login(data);
         if (res.success) {
-            navigate("/dashboard");
+            const currentUser = useAuthStore.getState().user;
+            const role = currentUser?.role;
+            if (role === "BANK_ADMIN") {
+                navigate("/dashboard/users");
+            } else {
+                navigate("/dashboard/user");
+            }
             toast.success("Inicio de sesión exitoso", { duration: 3000 });
         } else if (res.error) {
             toast.error(res.error, { duration: 4000 });

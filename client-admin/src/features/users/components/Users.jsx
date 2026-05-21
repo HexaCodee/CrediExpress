@@ -236,20 +236,20 @@ export const Users = () => {
   </div>
   <div className='hidden lg:flex flex-col gap-4'>
     <div className='bg-white/5 rounded-xl p-4 h-full flex flex-col'>
-      <h3 className='text-sm text-slate-300 mb-4 text-center'>
+      <h3 className='text-sm text-slate-300 mb-4 text-left'>
         Actividad reciente
       </h3>
       <ul className='text-sm text-slate-200 space-y-4 overflow-y-auto'>
 
         {recentActivities.map((activity, idx) => (
-          <li key={`${activity.user.id}-${idx}`} className='flex items-center gap-3'>
+          <li key={`${activity.user.id}-${idx}`} className='flex  gap-3'>
 
             <div className={`h-8 w-8 rounded-full ${getAvatarColor(idx)} flex items-center justify-center text-xs text-white font-semibold flex-shrink-0`}>
               {activity.user.name
                 ? activity.user.name.charAt(0).toUpperCase()
                 : 'U'}
             </div>
-            <div className='flex-1 min-w-0 text-center'>
+            <div className='flex-1 min-w-0'>
               <div className='text-sm font-semibold text-white truncate'>
                 {activity.user.name || activity.user.username}
               </div>

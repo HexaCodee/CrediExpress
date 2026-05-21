@@ -59,7 +59,6 @@ function _processQueue(_error, token = null) {
 const handleRefreshToken = async function (_error) {
   const _original = _error.config;
   if (!_original || _original._retry) {
-    // Ya se reintentó o no hay config
     return Promise.reject(_error);
   }
   const status = _error.response?.status;

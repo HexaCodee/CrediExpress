@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 export const ForgotPassword = ({ onSwitch }) => {
     const {
         register,
-        //    handleSubmit,
         formState: { errors },
     } = useForm();
 

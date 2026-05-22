@@ -12,9 +12,12 @@ export const corsOptions = {
         'http://localhost:3007',
         'http://localhost:3008',
         'http://localhost:3009',
+        // Vite dev server / client-admin
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-token'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-token', 'X-Requested-With', 'Accept', 'Origin'],
     optionsSuccessStatus: 200
 };

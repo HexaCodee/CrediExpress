@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../../features/auth/store/authStore';
+import { normalizeUserModel } from '../utils/user.js';
 
 const axiosAuth = axios.create({
   baseURL: import.meta.env.VITE_AUTH_URL,
@@ -17,25 +18,43 @@ const axiosAdmin = axios.create({
   },
 });
 
-axiosAuth.interceptors.request.use((config) => {
-  config._axiosClient = 'auth';
-  const token = useAuthStore.getState().token; 
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`; 
-  }
-
-  if (config.data instanceof FormData) {
-    delete config.headers['Content-Type'];
-  }
-
-  return config;
+const axiosConversion = axios.create({
+  baseURL: import.meta.env.VITE_CURRENCY_CONVERSION_URL,
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-axiosAdmin.interceptors.request.use((config) => {
-  config._axiosClient = 'admin';
+const axiosBank = axios.create({
+  baseURL: import.meta.env.VITE_BANK_URL,
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const axiosCoreBanking = axios.create({
+  baseURL: import.meta.env.VITE_CORE_BANKING_URL,
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const axiosAccountType = axios.create({
+  baseURL: import.meta.env.VITE_ACCOUNT_TYPE_URL,
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const applyAuthHeaders = (config, clientName) => {
+  config._axiosClient = clientName;
   const token = useAuthStore.getState().token;
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`; 
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
   if (config.data instanceof FormData) {
@@ -43,7 +62,19 @@ axiosAdmin.interceptors.request.use((config) => {
   }
 
   return config;
-});
+};
+
+axiosAuth.interceptors.request.use((config) => applyAuthHeaders(config, 'auth'));
+
+axiosAdmin.interceptors.request.use((config) => applyAuthHeaders(config, 'admin'));
+
+axiosBank.interceptors.request.use((config) => applyAuthHeaders(config, 'bank'));
+
+axiosCoreBanking.interceptors.request.use((config) => applyAuthHeaders(config, 'coreBanking'));
+
+axiosAccountType.interceptors.request.use((config) => applyAuthHeaders(config, 'accountType'));
+
+axiosConversion.interceptors.request.use((config) => applyAuthHeaders(config, 'conversion'));
 
 
 let _isRefreshing = false; 
@@ -76,7 +107,11 @@ const handleRefreshToken = async function (_error) {
 
   if (shouldRefresh) {
     const retryClient =
-      _original._axiosClient === 'admin' ? axiosAdmin : axiosAuth;
+      _original._axiosClient === 'admin'
+        ? axiosAdmin
+        : _original._axiosClient === 'conversion'
+        ? axiosConversion
+        : axiosAuth;
     if (_isRefreshing) {
       return new Promise(function (resolve, reject) {
         failedQueue.push({ resolve, reject });
@@ -101,12 +136,15 @@ const handleRefreshToken = async function (_error) {
         refreshToken: newRefreshToken,
         expiresIn,
         userDetails,
+        user,
+        User,
       } = response.data;
+      const normalizedUser = normalizeUserModel(userDetails || user || User) || useAuthStore.getState().user;
       useAuthStore.setState({
         token: accessToken,
         refreshToken: newRefreshToken,
         expiresAt: expiresIn,
-        user: userDetails || useAuthStore.getState().user,
+        user: normalizedUser,
         isAuthenticated: true,
       });
       _processQueue(null, accessToken);
@@ -127,5 +165,13 @@ axiosAuth.interceptors.response.use((res) => res, handleRefreshToken);
 
 axiosAdmin.interceptors.response.use((res) => res, handleRefreshToken);
 
+axiosBank.interceptors.response.use((res) => res, handleRefreshToken);
+
+axiosCoreBanking.interceptors.response.use((res) => res, handleRefreshToken);
+
+axiosAccountType.interceptors.response.use((res) => res, handleRefreshToken);
+
+axiosConversion.interceptors.response.use((res) => res, handleRefreshToken);
+
 export { handleRefreshToken };
-export { axiosAuth, axiosAdmin };
+export { axiosAuth, axiosAdmin, axiosConversion, axiosBank, axiosCoreBanking, axiosAccountType };

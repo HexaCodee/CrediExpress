@@ -23,7 +23,7 @@ export const LoginForm = ({ onForgot }) => {
             if (role === "BANK_ADMIN") {
                 navigate("/dashboard/users");
             } else {
-                navigate("/dashboard/user");
+                navigate("/dashboard/home");
             }
             toast.success("Inicio de sesión exitoso", { duration: 3000 });
         } else if (res.error) {

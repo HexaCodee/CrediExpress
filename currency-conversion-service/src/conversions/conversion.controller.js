@@ -22,6 +22,8 @@ export const quoteConversion = async (req, res, next) => {
 
 export const convertCurrency = async (req, res, next) => {
     try {
+        console.log('CONVERSION REQUEST BODY:', req.body);
+
         const { from, to, amount, description } = req.body;
         const result = await convertAndPersistInDB({
             from,
@@ -36,8 +38,14 @@ export const convertCurrency = async (req, res, next) => {
             message: 'Conversión realizada exitosamente',
             result,
         });
-    } catch (err) {
-        next(err);
+    } catch (error) {
+        console.log('ERROR CONVERSION:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message || 'Error en la conversión',
+            error: error.toString ? error.toString() : error,
+        });
     }
 };
 

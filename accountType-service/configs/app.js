@@ -42,6 +42,7 @@ const middlewares = (app) => {
 	app.use(express.json({ limit: '10mb' }));
 	app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 	app.use(cors(corsOptions));
+	app.options('*', cors(corsOptions));
 	app.use(helmet(helmetOptions));
 	app.use(morgan('dev'));
 	app.use(requestLimit);

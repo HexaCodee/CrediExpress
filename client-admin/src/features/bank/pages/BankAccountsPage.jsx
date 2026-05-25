@@ -114,19 +114,6 @@ export const BankAccountsPage = () => {
   }, [selectedUserId]);
 
   useEffect(() => {
-    const loadProfiles = async () => {
-      setLoadingProfiles(true);
-      try {
-        const response = await getBankProfiles();
-        const list = response.profiles || response || [];
-        const withAccounts = Array.isArray(list) ? list.filter(p => (p.accountNumbers || []).length > 0) : [];
-        setProfiles(withAccounts);
-      } catch (err) {
-      } finally {
-        setLoadingProfiles(false);
-      }
-    };
-
     loadProfiles();
   }, []);
 
@@ -146,6 +133,22 @@ export const BankAccountsPage = () => {
     setRiskLevel('LOW');
     setNotes('Apertura de cuenta de ahorro monetaria con depósito inicial.');
     setAccountNumber(generateAccountNumber());
+  };
+
+  const loadProfiles = async () => {
+    setLoadingProfiles(true);
+    try {
+      const response = await getBankProfiles();
+      const list = response.profiles || response || [];
+      const withAccounts = Array.isArray(list)
+        ? list.filter((p) => (p.accountNumbers || []).length > 0)
+        : [];
+      setProfiles(withAccounts);
+    } catch (err) {
+      setProfiles([]);
+    } finally {
+      setLoadingProfiles(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -215,6 +218,7 @@ export const BankAccountsPage = () => {
       );
 
       setExistingBankProfile(profileResponse.profile ?? null);
+      await loadProfiles();
       resetForm();
     } catch (err) {
       const message = err.response?.data?.message || err.message || 'Fallo al crear la cuenta bancaria.';

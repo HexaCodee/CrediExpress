@@ -15,6 +15,50 @@ const normalizeCurrency = (currency) => String(currency || '').trim().toUpperCas
 
 const buildProviderUrl = (baseCurrency, apiBaseUrl, apiKey) => `${apiBaseUrl}/${apiKey}/latest/${baseCurrency}`;
 
+const FALLBACK_CURRENCY_RATES = {
+    GTQ: 1,
+    USD: 7.8,
+    EUR: 8.4,
+};
+
+const getFallbackRatesForBase = (baseCurrency) => {
+    const normalizedBase = normalizeCurrency(baseCurrency);
+    if (!Object.prototype.hasOwnProperty.call(FALLBACK_CURRENCY_RATES, normalizedBase)) {
+        return null;
+    }
+
+    const baseValue = FALLBACK_CURRENCY_RATES[normalizedBase];
+    const rates = {};
+
+    for (const [code, value] of Object.entries(FALLBACK_CURRENCY_RATES)) {
+        // value = rateToGTQ for this currency (GTQ per 1 unit)
+        // To compute how many `code` units equal 1 `baseCurrency` unit:
+        // rate = baseValue / value
+        rates[code] = Number((baseValue / value).toFixed(6));
+    }
+
+    return rates;
+};
+
+const areRatesEqual = (leftRates, rightRates) => {
+    const normalizedLeft = leftRates instanceof Map ? Object.fromEntries(leftRates) : leftRates || {};
+    const normalizedRight = rightRates || {};
+
+    const leftKeys = Object.keys(normalizedLeft).sort();
+    const rightKeys = Object.keys(normalizedRight).sort();
+
+    if (leftKeys.length !== rightKeys.length) {
+        return false;
+    }
+
+    return leftKeys.every((key, index) => {
+        if (key !== rightKeys[index]) {
+            return false;
+        }
+        return Number(normalizedLeft[key]) === Number(normalizedRight[key]);
+    });
+};
+
 const isConfiguredApiKey = (apiKey) => !!apiKey && apiKey !== 'REPLACE_WITH_YOUR_KEY';
 
 const toRatesMap = (ratesObject) => {
@@ -33,6 +77,21 @@ const fetchRatesFromProvider = async (baseCurrency) => {
     const { apiBaseUrl, apiKey, cacheTtlMinutes, requestTimeoutMs } = getEnvConfig();
 
     if (!isConfiguredApiKey(apiKey)) {
+        const fallbackRates = getFallbackRatesForBase(baseCurrency);
+        if (fallbackRates) {
+            const fetchedAt = new Date();
+            const expiresAt = new Date(fetchedAt.getTime() + (cacheTtlMinutes * 60 * 1000));
+
+            console.warn(`EXCHANGE_RATE_API_KEY no está configurada. Usando tasas de fallback para ${baseCurrency}.`);
+            return {
+                baseCurrency,
+                rates: fallbackRates,
+                fetchedAt,
+                expiresAt,
+                provider: `${PROVIDER_NAME} (fallback)`,
+            };
+        }
+
         const error = new Error('EXCHANGE_RATE_API_KEY no está configurada');
         error.statusCode = 500;
         throw error;
@@ -93,11 +152,11 @@ const getValidSnapshot = async (baseCurrency) => {
     });
 };
 
-const upsertSnapshot = async ({ baseCurrency, rates, fetchedAt, expiresAt }) => {
+const upsertSnapshot = async ({ baseCurrency, rates, fetchedAt, expiresAt, provider = PROVIDER_NAME }) => {
     return await RateSnapshot.findOneAndUpdate(
         { baseCurrency },
         {
-            provider: PROVIDER_NAME,
+            provider,
             baseCurrency,
             rates,
             fetchedAt,
@@ -170,7 +229,7 @@ export const refreshRatesByBaseInDB = async (baseCurrencyInput = 'USD') => {
 
     return {
         baseCurrency,
-        provider: PROVIDER_NAME,
+        provider: snapshot.provider,
         fetchedAt: snapshot.fetchedAt,
         expiresAt: snapshot.expiresAt,
         ratesCount: snapshot.rates?.size || Object.keys(snapshot.rates || {}).length,
@@ -189,12 +248,39 @@ export const getRatesByBaseInDB = async (baseCurrencyInput = 'USD') => {
 
     const cachedSnapshot = await getValidSnapshot(baseCurrency);
     if (cachedSnapshot) {
+        const normalizedRates = cachedSnapshot.rates instanceof Map
+            ? Object.fromEntries(cachedSnapshot.rates)
+            : cachedSnapshot.rates;
+
+        const fallbackRates = cachedSnapshot.provider?.includes('(fallback)')
+            ? getFallbackRatesForBase(baseCurrency)
+            : null;
+
+        if (fallbackRates && !areRatesEqual(normalizedRates, fallbackRates)) {
+            await upsertSnapshot({
+                baseCurrency,
+                rates: fallbackRates,
+                fetchedAt: cachedSnapshot.fetchedAt,
+                expiresAt: cachedSnapshot.expiresAt,
+                provider: cachedSnapshot.provider,
+            });
+
+            return {
+                baseCurrency,
+                provider: cachedSnapshot.provider,
+                fetchedAt: cachedSnapshot.fetchedAt,
+                expiresAt: cachedSnapshot.expiresAt,
+                rates: fallbackRates,
+                source: 'cache',
+            };
+        }
+
         return {
             baseCurrency,
             provider: cachedSnapshot.provider,
             fetchedAt: cachedSnapshot.fetchedAt,
             expiresAt: cachedSnapshot.expiresAt,
-            rates: cachedSnapshot.rates,
+            rates: normalizedRates,
             source: 'cache',
         };
     }

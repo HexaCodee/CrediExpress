@@ -54,7 +54,7 @@ export const seedProducts = async () => {
             category: 'ACCOUNT',
             minimumOpeningAmount: 100,
             maintenanceFee: 0,
-            allowedCurrencies: ['GTQ', 'USD'],
+            allowedCurrencies: ['USD', 'GTQ'],
         },
         {
             code: 'CHECKING',
@@ -63,7 +63,7 @@ export const seedProducts = async () => {
             category: 'ACCOUNT',
             minimumOpeningAmount: 200,
             maintenanceFee: 25,
-            allowedCurrencies: ['GTQ', 'USD', 'EUR'],
+            allowedCurrencies: ['USD', 'GTQ', 'EUR'],
         },
         {
             code: 'PREMIUM',
@@ -72,7 +72,7 @@ export const seedProducts = async () => {
             category: 'ACCOUNT',
             minimumOpeningAmount: 1000,
             maintenanceFee: 45,
-            allowedCurrencies: ['GTQ', 'USD', 'EUR'],
+            allowedCurrencies: ['USD', 'GTQ', 'EUR'],
         }
     ];
 

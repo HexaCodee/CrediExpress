@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../../features/auth/store/authStore.js';
+import { normalizeUserModel } from '../../utils/user.js';
 import defaultAvatarImg from '../../../assets/img/avatarDefault-1749508519496.png';
 
 export const AvatarUser = () => {
-  const { user, logout } = useAuthStore();
+  const { user: rawUser, logout } = useAuthStore();
+  const user = normalizeUserModel(rawUser) || rawUser;
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -28,9 +30,11 @@ export const AvatarUser = () => {
   };
 
   const avatarSrc =
-    user?.profilePicture && user.profilePicture.trim() !== ''
+    (user?.profilePicture && user.profilePicture.trim() !== ''
       ? user.profilePicture
-      : defaultAvatarImg;
+      : user?.ProfilePicture && user.ProfilePicture.trim() !== ''
+      ? user.ProfilePicture
+      : defaultAvatarImg);
 
   return (
     <div className='relative' ref={dropdownRef}>

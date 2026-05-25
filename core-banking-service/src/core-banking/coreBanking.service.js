@@ -206,8 +206,8 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
         throw error;
     }
 
-    const fromAccount = await CoreAccount.findOne({ accountNumber: fromAccountNumber });
-    const toAccount = await CoreAccount.findOne({ accountNumber: toAccountNumber });
+    let fromAccount = await CoreAccount.findOne({ accountNumber: fromAccountNumber });
+    let toAccount = await CoreAccount.findOne({ accountNumber: toAccountNumber });
 
     if (!fromAccount || !toAccount) {
         const error = new Error('Cuenta origen o destino no encontrada');
@@ -266,17 +266,34 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
         }
     }
 
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    let session = null;
+    let useTransaction = true;
 
     try {
+        session = await mongoose.startSession();
+        session.startTransaction();
+    } catch (transactionError) {
+        useTransaction = false;
+        if (session) {
+            await session.endSession();
+            session = null;
+        }
+    }
+
+    const executeTransfer = async (sessionOption) => {
         fromAccount.balance -= amount;
         toAccount.balance += creditAmount;
 
-        await fromAccount.save({ session });
-        await toAccount.save({ session });
+        if (sessionOption) {
+            await fromAccount.save({ session: sessionOption });
+            await toAccount.save({ session: sessionOption });
+        } else {
+            await fromAccount.save();
+            await toAccount.save();
+        }
 
         const referenceId = buildReference('TRX');
+        const transactionOptions = sessionOption ? { session: sessionOption } : undefined;
 
         const [debitTx] = await Transaction.create([
             {
@@ -292,7 +309,7 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
                     : (description || 'Transferencia enviada'),
                 createdByUserId: createdByUserId || null,
             }
-        ], { session });
+        ], transactionOptions);
 
         const [creditTx] = await Transaction.create([
             {
@@ -308,10 +325,7 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
                     : (description || 'Transferencia recibida'),
                 createdByUserId: createdByUserId || null,
             }
-        ], { session });
-
-        await session.commitTransaction();
-        session.endSession();
+        ], transactionOptions);
 
         return {
             referenceId,
@@ -321,9 +335,45 @@ export const transferInDB = async ({ fromAccountNumber, toAccountNumber, amount,
             debitTransaction: debitTx,
             creditTransaction: creditTx,
         };
+    };
+
+    try {
+        const result = await executeTransfer(useTransaction ? session : undefined);
+
+        if (useTransaction && session) {
+            await session.commitTransaction();
+            await session.endSession();
+        }
+
+        return result;
     } catch (err) {
-        await session.abortTransaction();
-        session.endSession();
+        const transactionNotSupported = err.message?.includes('Transaction numbers are only allowed on a replica set member or mongos');
+        if (transactionNotSupported && useTransaction) {
+            if (session) {
+                await session.abortTransaction().catch(() => {});
+                await session.endSession().catch(() => {});
+            }
+
+            useTransaction = false;
+            session = null;
+
+            const refreshedFromAccount = await CoreAccount.findOne({ accountNumber: fromAccountNumber });
+            const refreshedToAccount = await CoreAccount.findOne({ accountNumber: toAccountNumber });
+
+            if (!refreshedFromAccount || !refreshedToAccount) {
+                throw err;
+            }
+
+            fromAccount = refreshedFromAccount;
+            toAccount = refreshedToAccount;
+
+            return await executeTransfer();
+        }
+
+        if (useTransaction && session) {
+            await session.abortTransaction().catch(() => {});
+            await session.endSession().catch(() => {});
+        }
         throw err;
     }
 };

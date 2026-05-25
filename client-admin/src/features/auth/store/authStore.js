@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { login as loginRequest, register as registerRequest } from "../../../shared/apis";
-import { showError } from "../../../shared/utils/toast.js";
+import { normalizeUserModel } from "../../../shared/utils/user.js";
 
 export const useAuthStore = create(
     persist(
@@ -49,27 +49,32 @@ export const useAuthStore = create(
             login: async ({ emailOrUsername, password }) => {
                 try {
                     set({ loading: true, error: null });
-                    //------------------------------------------------------------------------------------
+                    
                     const { data } = await loginRequest({ emailOrUsername, password });
 
                     console.log("DATA BACKEND:", data);
 
-                    // Adaptación flexible a diferentes respuestas del backend
-                    const token = data?.accessToken || data?.token;
-                    const refresh = data?.refreshToken || null;;
-                    const user = data?.userDetails || data?.user;
+                    const token = data?.accessToken || data?.token || data?.AccessToken || data?.Token;
+                    const refresh = data?.refreshToken || data?.RefreshToken || null;
+                    const rawUser =
+                        data?.userDetails ||
+                        data?.user ||
+                        data?.User ||
+                        data?.userDetails ||
+                        data?.UserDetails ||
+                        data;
+                    const user = normalizeUserModel(rawUser);
 
-                    if (!token ||/* !refresh || */ !user) {
+                    if (!token || !user) {
                         throw new Error("Respuesta inválida del servicio de autenticación");
                     }
-                    //------------------------------------------------------------------------------------
-                    // Allow any authenticated role. Routing and UI will adapt based on `user.role`.
+                    
 
-                    const expiresIn = Number(data.expiresIn);
+                    const expiresIn = Number(data.expiresIn || data?.ExpiresIn || data?.expires_in || 0);
                     const expiresAt = Number.isFinite(expiresIn) && expiresIn > 0
                         ? Date.now() + expiresIn * 1000
                         : null;
-                    //------------------------------------------------------------------------------------
+                    
                     set({
                         user: user,
                         token: token,
@@ -80,7 +85,7 @@ export const useAuthStore = create(
                         isLoadingAuth: false,
                         error: null,
                     });
-                    //------------------------------------------------------------------------------------
+                    
                     return { success: true };
                 } catch (err) {
                     const message =

@@ -40,6 +40,29 @@ export const validateJWT = (req, res, next) => {
 
         next();
     } catch (error) {
+        // Try to decode token without verifying to inspect header/payload for debugging
+        let decodedSafe = null;
+        try {
+            decodedSafe = jwt.decode(token, { complete: true });
+        } catch (e) {
+            // ignore decode errors
+        }
+
+        console.error('JWT verification failed:', {
+            name: error?.name,
+            message: error?.message,
+            tokenPreview: token ? `${token.substring(0, 10)}...` : null,
+            decoded: decodedSafe ? {
+                header: decodedSafe.header,
+                payload: decodedSafe.payload,
+            } : null,
+            expected: {
+                issuer: jwtConfig.issuer || null,
+                audience: jwtConfig.audience || null,
+                secretLoaded: !!jwtConfig.secret,
+                secretLength: jwtConfig.secret ? jwtConfig.secret.length : 0,
+            }
+        });
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({
                 success: false,

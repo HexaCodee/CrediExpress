@@ -10,6 +10,25 @@ const baseStyle = {
   boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08)",
 };
 
+const recentErrors = new Map();
+const ERROR_TTL_MS = 4000;
+
+const shouldSkipDuplicateError = (message) => {
+  if (!message) {
+    return false;
+  }
+
+  const now = Date.now();
+  const lastSeenAt = recentErrors.get(message);
+
+  if (lastSeenAt && now - lastSeenAt < ERROR_TTL_MS) {
+    return true;
+  }
+
+  recentErrors.set(message, now);
+  return false;
+};
+
 export const showSuccess = (message) =>
   toast.success(message, {
     style: {
@@ -25,18 +44,20 @@ export const showSuccess = (message) =>
   });
 
 export const showError = (message) =>
-  toast.error(message, {
-    style: {
-      ...baseStyle,
-      background: "linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)",
-      color: "#fff",
-      border: "2px solid #ef4444",
-    },
-    iconTheme: {
-      primary: "#ef4444",
-      secondary: "#fff",
-    },
-  });
+  shouldSkipDuplicateError(message)
+    ? null
+    : toast.error(message, {
+        style: {
+          ...baseStyle,
+          background: "linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)",
+          color: "#fff",
+          border: "2px solid #ef4444",
+        },
+        iconTheme: {
+          primary: "#ef4444",
+          secondary: "#fff",
+        },
+      });
 
 export const showInfo = (message) =>
   toast(message, {

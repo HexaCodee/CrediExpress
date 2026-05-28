@@ -18,6 +18,32 @@ function runOneOff(command, args, label) {
   }
 }
 
+function waitForContainerHealth(containerName, timeoutMs = 120000) {
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    const result = spawnSync('docker', ['inspect', '-f', '{{.State.Health.Status}}', containerName], {
+      cwd: workspaceRoot,
+      encoding: 'utf8',
+      shell: true,
+    });
+
+    const status = result.stdout?.trim();
+
+    if (status === 'healthy') {
+      return;
+    }
+
+    if (result.status === 0 && status && status !== 'starting' && status !== 'unhealthy') {
+      return;
+    }
+
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000);
+  }
+
+  throw new Error(`Timed out waiting for ${containerName} to become healthy`);
+}
+
 function startProcess(command, args, label) {
   const child = spawn(command, args, {
     cwd: workspaceRoot,
@@ -68,7 +94,10 @@ function shutdown() {
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
+runOneOff('node', ['scripts/stop.mjs'], 'workspace stop');
 runOneOff('docker', ['compose', '-f', 'pg/docker-compose.yml', 'up', '-d', '--build'], 'docker compose');
+waitForContainerHealth('crediexpress_postgres');
+waitForContainerHealth('crediexpress_mongodb');
 
 children.add(startProcess('pnpm', ['-r', '--parallel', '--stream', 'run', 'dev'], 'node'));
 children.add(startProcess('dotnet', ['run', '--project', 'authentication-service/auth-service/src/AuthService.Api/AuthService.Api.csproj', '--launch-profile', 'http'], 'auth'));

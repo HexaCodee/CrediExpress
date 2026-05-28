@@ -96,19 +96,20 @@ const handleRefreshToken = async function (_error) {
   const errorCode = _error.response?.data?.error;
   const requestUrl = _original.url || '';
   const isRefreshEndpoint = requestUrl.includes('/auth/refresh');
-  const shouldAttemptRefresh =
+  const shouldRefresh =
     !isRefreshEndpoint &&
-    status === 401;
-
-  const shouldAttemptRefreshFrom403 =
-    !isRefreshEndpoint && status === 403 && errorCode === 'TOKEN_EXPIRED';
-
-  const shouldRefresh = shouldAttemptRefresh || shouldAttemptRefreshFrom403;
+    ((status === 401 || status === 403) && errorCode === 'TOKEN_EXPIRED');
 
   if (shouldRefresh) {
     const retryClient =
       _original._axiosClient === 'admin'
         ? axiosAdmin
+        : _original._axiosClient === 'bank'
+        ? axiosBank
+        : _original._axiosClient === 'coreBanking'
+        ? axiosCoreBanking
+        : _original._axiosClient === 'accountType'
+        ? axiosAccountType
         : _original._axiosClient === 'conversion'
         ? axiosConversion
         : axiosAuth;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useUserManagementStore } from '../../users/store/useUserManagementStore.js';
 import { getAccountTypes } from '../../../shared/apis/accountType.js';
 import {
@@ -59,20 +59,28 @@ export const BankAccountsPage = () => {
   const [accountNumber, setAccountNumber] = useState(generateAccountNumber());
   const [existingBankProfile, setExistingBankProfile] = useState(null);
   const [accountTypes, setAccountTypes] = useState(DEFAULT_ACCOUNT_TYPES);
+  const [accountTypesError, setAccountTypesError] = useState('');
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [profiles, setProfiles] = useState([]);
   const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const [profilesError, setProfilesError] = useState('');
   const [movementsCache, setMovementsCache] = useState({}); 
   const [expandedAccounts, setExpandedAccounts] = useState({});
+  const hasLoadedAccountTypesRef = useRef(false);
+  const hasLoadedProfilesRef = useRef(false);
 
   useEffect(() => {
     getAllUsers();
   }, [getAllUsers]);
 
   useEffect(() => {
+    if (hasLoadedAccountTypesRef.current) return;
+    hasLoadedAccountTypesRef.current = true;
+
     const loadAccountTypes = async () => {
       try {
+        setAccountTypesError('');
         const data = await getAccountTypes();
         if (Array.isArray(data?.accountTypes)) {
           setAccountTypes(
@@ -83,7 +91,9 @@ export const BankAccountsPage = () => {
             }))
           );
         }
-      } catch {
+      } catch (error) {
+        setAccountTypes(DEFAULT_ACCOUNT_TYPES);
+        setAccountTypesError(error instanceof Error ? error.message : 'No se pudieron cargar los tipos de cuenta.');
       }
     };
 
@@ -99,12 +109,7 @@ export const BankAccountsPage = () => {
         const response = await getBankProfileByUserId(selectedUserId);
         setExistingBankProfile(response.profile);
       } catch (error) {
-        if (error.response?.status === 404) {
-          setExistingBankProfile(null);
-        } else {
-          showError(error.response?.data?.message || 'No se pudo cargar el perfil bancario del usuario.');
-          setExistingBankProfile(null);
-        }
+        setExistingBankProfile(null);
       } finally {
         setLoadingProfile(false);
       }
@@ -114,6 +119,9 @@ export const BankAccountsPage = () => {
   }, [selectedUserId]);
 
   useEffect(() => {
+    if (hasLoadedProfilesRef.current) return;
+    hasLoadedProfilesRef.current = true;
+
     loadProfiles();
   }, []);
 
@@ -138,6 +146,7 @@ export const BankAccountsPage = () => {
   const loadProfiles = async () => {
     setLoadingProfiles(true);
     try {
+      setProfilesError('');
       const response = await getBankProfiles();
       const list = response.profiles || response || [];
       const withAccounts = Array.isArray(list)
@@ -145,6 +154,11 @@ export const BankAccountsPage = () => {
         : [];
       setProfiles(withAccounts);
     } catch (err) {
+      const message = err instanceof Error ? err.message : 'No se pudieron cargar los perfiles bancarios.';
+      setProfilesError(message);
+      if (!message.includes('Bank-service rechazó') && !message.includes('No tienes permisos')) {
+        showError(message);
+      }
       setProfiles([]);
     } finally {
       setLoadingProfiles(false);
@@ -337,6 +351,11 @@ export const BankAccountsPage = () => {
                     </option>
                   ))}
                 </select>
+                {accountTypesError && (
+                  <p className='text-xs text-amber-300'>
+                    {accountTypesError} Se mostrarán las opciones locales por defecto.
+                  </p>
+                )}
               </label>
 
               <label className='space-y-2 text-sm text-slate-300'>
@@ -452,6 +471,14 @@ export const BankAccountsPage = () => {
           <div className='p-4 text-slate-300'>Cargando perfiles...</div>
         ) : (
           <div className='rounded-3xl bg-slate-900/80 border border-slate-700 p-4'>
+            {profilesError && (
+              <div className='mb-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200'>
+                {profilesError}
+                <div className='mt-1 text-xs text-amber-300'>
+                  Se usará el resto de la vista con datos locales mientras se corrige la conexión.
+                </div>
+              </div>
+            )}
             <table className='w-full table-auto text-sm text-left'>
               <thead>
                 <tr className='text-slate-300'>

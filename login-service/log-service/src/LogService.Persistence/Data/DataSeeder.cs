@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using LoginService.Domain.Entities;
 using LoginService.Domain.Constants;
 using LoginService.Application.Services;
@@ -44,8 +45,8 @@ public class DataSeeder
             return;
         }
 
-        var adminUser = await context.Users.FirstOrDefaultAsync(u => u.Username == adminUsername || u.Email == adminEmail);
-        var oldAdmin = await context.Users.FirstOrDefaultAsync(u => u.Username == "admin" || u.Email == "admin@gmail.com");
+        var adminUser = await context.Users.FirstOrDefaultAsync(u => EF.Functions.ILike(u.Username, adminUsername) || EF.Functions.ILike(u.Email, adminEmail));
+        var oldAdmin = await context.Users.FirstOrDefaultAsync(u => EF.Functions.ILike(u.Username, "admin") || EF.Functions.ILike(u.Email, "admin@gmail.com"));
 
         var passwordHasher = new PasswordHashService();
 
@@ -72,8 +73,8 @@ public class DataSeeder
         var newAdmin = new User
         {
             Id = userId,
-            Name = "Admin B",
-            Surname = "Admin B",
+            Name = "AdminB",
+            Surname = "AdminB",
             Username = adminUsername,
             Email = adminEmail,
             Password = passwordHasher.HashPassword(adminPassword),
@@ -85,7 +86,7 @@ public class DataSeeder
                 ProfilePicture = string.Empty,
                 Phone = "00000000",
                 AccountNumber = string.Empty,
-                Dpi = string.Empty,
+                Dpi = await GenerateUniqueNumericCodeAsync(context, 13),
                 Address = string.Empty,
                 JobName = string.Empty,
                 MonthlyIncome = 100
@@ -111,5 +112,26 @@ public class DataSeeder
 
         await context.Users.AddAsync(newAdmin);
         await context.SaveChangesAsync();
+    }
+
+    private static async Task<string> GenerateUniqueNumericCodeAsync(ApplicationDbContext context, int length)
+    {
+        while (true)
+        {
+            var digits = new char[length];
+
+            for (var index = 0; index < length; index++)
+            {
+                digits[index] = (char)('0' + RandomNumberGenerator.GetInt32(0, 10));
+            }
+
+            var dpi = new string(digits);
+            var exists = await context.UserProfiles.AnyAsync(userProfile => userProfile.Dpi == dpi);
+
+            if (!exists)
+            {
+                return dpi;
+            }
+        }
     }
 }

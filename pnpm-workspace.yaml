@@ -1,0 +1,9 @@
+packages:
+  - account-service
+  - accountType-service
+  - bank-service
+  - core-banking-service
+  - currency-conversion-service
+  - product-currency-service
+  - role-node
+  - client-admin

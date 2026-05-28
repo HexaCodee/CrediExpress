@@ -1,6 +1,21 @@
 {
-	"dependencies": {
-		"swagger-jsdoc": "^6.2.8",
-		"swagger-ui-express": "^5.0.1"
+	"name": "crediexpress-workspace",
+	"version": "1.0.0",
+	"private": true,
+	"description": "Monorepo workspace for CrediExpress Node.js and .NET services",
+	"packageManager": "pnpm@10.29.3",
+	"scripts": {
+		"postinstall": "pnpm run restore:dotnet",
+		"restore:dotnet": "dotnet restore authentication-service/auth-service/AuthService.sln && dotnet restore login-service/log-service/LogService.sln",
+		"dev:docker": "docker compose -f pg/docker-compose.yml up -d --build",
+		"dev:node": "pnpm -r --parallel --stream run dev",
+		"dev:dotnet:auth": "dotnet run --project authentication-service/auth-service/src/AuthService.Api/AuthService.Api.csproj --launch-profile http",
+		"dev:dotnet:log": "dotnet run --project login-service/log-service/src/LogService.Api/LogService.Api.csproj --launch-profile http",
+		"dev": "node scripts/dev.mjs",
+		"format": "prettier . --write",
+		"format:check": "prettier . --check"
+	},
+	"devDependencies": {
+		"prettier": "^3.6.2"
 	}
 }

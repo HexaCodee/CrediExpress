@@ -16,6 +16,7 @@
 **/bin/
 **/obj/
 **/publish/
+**/node_modules/
 *.dll
 *.exe
 *.pdb

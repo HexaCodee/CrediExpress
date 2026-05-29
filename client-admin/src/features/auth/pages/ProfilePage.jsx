@@ -28,6 +28,7 @@ export const ProfilePage = () => {
   const [message, setMessage] = useState(null);
   const [adminUser, setAdminUser] = useState(null);
   const [loadingAdminUser, setLoadingAdminUser] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   
 
   useEffect(() => {
@@ -75,12 +76,9 @@ export const ProfilePage = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (files && files[0]) {
-      setForm((prev) => ({ ...prev, [name]: files[0] }));
-      setPreview(URL.createObjectURL(files[0]));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    }
+    // Prevent users from modifying profilePicture directly
+    if (name === 'profilePicture') return;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -141,6 +139,15 @@ export const ProfilePage = () => {
               <p className='text-sm text-slate-400'>Rol: {authUser.role || authUser.Role || 'Usuario'}</p>
             </div>
           </div>
+          <div>
+            <button
+              type='button'
+              onClick={() => setShowEdit(true)}
+              className='rounded-2xl bg-sky-500 px-4 py-2 text-sm font-semibold text-white'
+            >
+              Editar perfil
+            </button>
+          </div>
         </div>
       </header>
 
@@ -176,7 +183,8 @@ export const ProfilePage = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className='rounded-3xl bg-slate-900/80 p-6 shadow-xl border border-slate-700'>
+        {showEdit && (
+          <form onSubmit={handleSubmit} className='rounded-3xl bg-slate-900/80 p-6 shadow-xl border border-slate-700'>
           <h2 className='text-xl font-semibold text-white mb-4'>Editar datos autorizados</h2>
           <div className='grid gap-4'>
             <label className='space-y-2 text-sm text-slate-300'>
@@ -199,10 +207,7 @@ export const ProfilePage = () => {
               Teléfono
               <input name='phone' value={form.phone} onChange={handleChange} className='w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white' />
             </label>
-            <label className='space-y-2 text-sm text-slate-300'>
-              Foto de perfil
-              <input name='profilePicture' onChange={handleChange} type='file' accept='image/*' className='w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white' />
-            </label>
+            {/* Users cannot change profile picture here; controlled by admins */}
           </div>
 
           {message && <div className='rounded-2xl border border-slate-600 bg-slate-800/60 px-4 py-3 text-sm text-slate-200'>{message}</div>}
@@ -210,8 +215,10 @@ export const ProfilePage = () => {
           <div className='mt-6 flex flex-col gap-3 sm:flex-row'>
             <button disabled={loading} className='inline-flex items-center justify-center rounded-2xl bg-sky-500 px-5 py-3 text-sm font-semibold text-white'>Guardar cambios</button>
             <button type='button' onClick={() => setMessage('Para seguridad, la contraseña se cambia en la sección de seguridad.') } className='inline-flex items-center justify-center rounded-2xl border border-slate-700 px-5 py-3 text-sm font-semibold text-white'>Cambiar contraseña</button>
+            <button type='button' onClick={() => setShowEdit(false)} className='inline-flex items-center justify-center rounded-2xl border border-slate-700 px-5 py-3 text-sm font-semibold text-white'>Cerrar</button>
           </div>
-        </form>
+          </form>
+        )}
       </div>
       
     </section>

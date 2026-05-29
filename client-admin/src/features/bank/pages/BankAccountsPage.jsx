@@ -260,7 +260,6 @@ export const BankAccountsPage = () => {
         <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <h1 className='text-3xl font-semibold text-white'>Administración de cuentas</h1>
-            <p className='mt-2 text-sm text-slate-300'>Crea cuentas de ahorro comerciales para clientes desde el panel administrativo.</p>
           </div>
         </div>
       </header>
@@ -315,7 +314,6 @@ export const BankAccountsPage = () => {
                     <p className='text-sm text-slate-200'>Perfil existente</p>
                     <p className='text-sm text-slate-400'>Cuentas activas: {existingBankProfile.accountNumbers.length}</p>
                     <p className='text-sm text-slate-400'>Moneda preferida: {existingBankProfile.preferredCurrency}</p>
-                    <p className='text-sm text-slate-400'>Riesgo: {existingBankProfile.riskLevel}</p>
                   </div>
                 ) : (
                   <p className='text-sm text-slate-300'>Este cliente aún no tiene un perfil bancario. Puedes crearle una cuenta de ahorro segura.</p>
@@ -329,10 +327,6 @@ export const BankAccountsPage = () => {
           <div className='flex flex-col gap-3 md:flex-row md:items-start md:justify-between'>
             <div>
               <h2 className='text-xl font-semibold text-white'>Crear cuenta de ahorro</h2>
-              <p className='mt-2 text-sm text-slate-300'>Define la propuesta bancaria, monto inicial y fecha de apertura.</p>
-            </div>
-            <div className='rounded-3xl bg-slate-950/80 border border-slate-700 px-4 py-3 text-sm text-slate-200'>
-              {existingBankProfile ? 'Agregando producto a perfil existente' : 'Apertura de nuevo perfil bancario'}
             </div>
           </div>
 
@@ -385,19 +379,6 @@ export const BankAccountsPage = () => {
                   placeholder='500.00'
                 />
               </label>
-
-              <label className='space-y-2 text-sm text-slate-300'>
-                Nivel de riesgo
-                <select
-                  value={riskLevel}
-                  onChange={(event) => setRiskLevel(event.target.value)}
-                  className='w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-sky-500'
-                >
-                  <option value='LOW'>LOW</option>
-                  <option value='MEDIUM'>MEDIUM</option>
-                  <option value='HIGH'>HIGH</option>
-                </select>
-              </label>
             </div>
 
             <div className='grid gap-4 lg:grid-cols-2'>
@@ -438,7 +419,6 @@ export const BankAccountsPage = () => {
                 <li>Producto: <strong>{accountTypes.find((item) => item.id === accountType)?.label || accountType}</strong></li>
                 <li>Monto inicial: <strong>{formatAmount(initialDeposit)} {currency}</strong></li>
                 <li>Número de cuenta: <strong>{accountNumber}</strong></li>
-                <li>Riesgo asignado: <strong>{riskLevel}</strong></li>
               </ul>
             </div>
 
@@ -462,10 +442,7 @@ export const BankAccountsPage = () => {
         </div>
       </div>
       <section className='mt-8'>
-        <header className='rounded-3xl bg-slate-900/80 p-4 shadow-xl border border-slate-700 mb-4'>
-          <h2 className='text-xl font-semibold text-white'>Resumen: usuarios con cuentas y movimientos</h2>
-          <p className='mt-1 text-sm text-slate-300'>Lista de usuarios que tienen cuentas operacionales, sus cuentas y movimientos recientes.</p>
-        </header>
+
 
         {loadingProfiles ? (
           <div className='p-4 text-slate-300'>Cargando perfiles...</div>

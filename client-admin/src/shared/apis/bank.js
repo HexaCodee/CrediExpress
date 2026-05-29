@@ -59,10 +59,16 @@ export const getBankProfileByUserId = async (userId) => {
   }
 
   try {
-    const { data } = await axiosBank.get(`${BANK_PATH}/${userId}`);
+    const { data } = await axiosBank.get(
+      `${BANK_PATH}/${userId}?_=${Date.now()}`
+    );
     return data;
   } catch (error) {
-    throw new Error(
+    if (error.response?.status === 404) {
+      return null;
+    }
+    
+    const err = new Error(
       getBankErrorMessage(
         error,
         baseURL,
@@ -70,6 +76,9 @@ export const getBankProfileByUserId = async (userId) => {
         'No se pudo cargar el perfil bancario del usuario.'
       )
     );
+    err.status = error.response?.status;
+    err.response = error.response;
+    throw err;
   }
 };
 

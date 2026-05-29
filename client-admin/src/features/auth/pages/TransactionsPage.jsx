@@ -110,6 +110,18 @@ export const TransactionsPage = () => {
       return;
     }
 
+    if (!destinationInfo) {
+      setError('Cuenta destino no encontrada o no disponible.');
+      return;
+    }
+
+    const sourceCurrency = (selectedAccount?.currency || '').toString().toUpperCase();
+    const destinationCurrency = (destinationInfo?.currency || '').toString().toUpperCase();
+    if (sourceCurrency && destinationCurrency && sourceCurrency !== destinationCurrency) {
+      setError(`La transferencia solo se puede realizar entre cuentas con la misma moneda (${sourceCurrency}).`);
+      return;
+    }
+
     const transferAmount = Number(amount);
     if (Number.isNaN(transferAmount) || transferAmount <= 0) {
       setError('Ingresa un monto válido mayor a cero.');
@@ -174,7 +186,7 @@ export const TransactionsPage = () => {
             {selectedAccount ? (
               <div className='rounded-3xl border border-slate-700 bg-slate-950/70 p-4 text-slate-200'>
                 <p className='text-xs uppercase tracking-[0.24em] text-slate-400'>Saldo disponible</p>
-                <p className='mt-2 text-3xl font-semibold text-white'>$ {formatAmount(selectedAccount.balance)}</p>
+                <p className='mt-2 text-3xl font-semibold text-white'>{formatAmount(selectedAccount.balance)}</p>
                 <p className='mt-1 text-sm text-slate-400'>Moneda: {selectedAccount.currency || bankProfile.preferredCurrency || 'GTQ'}</p>
               </div>
             ) : (
@@ -245,7 +257,7 @@ export const TransactionsPage = () => {
                   return (
                     <div key={accountNumber} className='rounded-3xl border border-slate-800 bg-slate-950/80 p-4'>
                       <p className='text-sm text-slate-300'>{accountNumber}</p>
-                      <p className='mt-2 text-lg font-semibold text-white'>$ {formatAmount(detail.balance)}</p>
+                      <p className='mt-2 text-lg font-semibold text-white'>{formatAmount(detail.balance)}</p>
                       <p className='text-xs text-slate-500'>Moneda: {detail.currency || bankProfile.preferredCurrency || 'GTQ'}</p>
                     </div>
                   );
@@ -260,7 +272,7 @@ export const TransactionsPage = () => {
             <div className='rounded-3xl border border-slate-700 bg-slate-950/70 p-4'>
               <p className='text-xs uppercase tracking-[0.24em] text-slate-400'>Información destino</p>
               <p className='mt-2 text-lg font-semibold text-white'>{destinationInfo.accountNumber}</p>
-              <p className='mt-1 text-sm text-slate-400'>Saldo actual: $ {formatAmount(destinationInfo.balance)}</p>
+              <p className='mt-1 text-sm text-slate-400'>Saldo actual: {formatAmount(destinationInfo.balance)}</p>
             </div>
           )}
 

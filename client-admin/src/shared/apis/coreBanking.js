@@ -21,7 +21,9 @@ export const getRecentMovements = async (accountNumber, limit) => {
 };
 
 export const getOperationalAccount = async (accountNumber) => {
-  const { data } = await axiosCoreBanking.get(`/core-banking/accounts/${accountNumber}`);
+  const { data } = await axiosCoreBanking.get(
+    `/core-banking/accounts/${accountNumber}?_=${Date.now()}`
+  );
   return data;
 };
 

@@ -14,6 +14,8 @@ export const useAuthStore = create(
             error: null,
             isLoadingAuth: true,
             isAuthenticated: false,
+            bankProfileUpdatedAt: null,
+            markBankProfileUpdated: () => set({ bankProfileUpdatedAt: Date.now() }),
             checkAuth: () => {
                 const token = get().token;
 

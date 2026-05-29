@@ -24,12 +24,12 @@ export const AuthPage = () => {
             >
 
                 <div className='absolute top-0 left-[-1090px] w-500 h-50 bg-[#0A1F44] rotate-[-35deg] z-10'></div>
-                <div className="absolute top-0 left-[-165px] w-200 h-3 bg-red-600 rotate-[-35deg] z-10"></div>
+                <div className="absolute top-0 left-[-165px] w-200 h-3 bg-red-900 rotate-[-35deg] z-10"></div>
                 <div className="absolute top-6 left-[-180px] w-200 h-[2px] bg-red-900 shadow-[0_0_25px_red,0_0_25px_red,0_0_30px_red,0_0_60px_red] rotate-[-35deg] z-10 opacity-70"></div>
                 <div className="absolute top-6 left-[-205px] w-200 h-[2px] bg-red-900 shadow-[0_0_25px_red,0_0_25px_red,0_0_30px_red,0_0_60px_red] rotate-[-35deg] z-10 opacity-70"></div>
 
                 <div className="absolute top-200 right-[-220px] w-200 h-40 bg-[#0A1F44] rotate-[-35deg] z-10"></div>
-                <div className="absolute top-200 right-[-175px] w-200 h-3 bg-red-600 rotate-[-35deg] z-10"></div>
+                <div className="absolute top-200 right-[-175px] w-200 h-3 bg-red-900 rotate-[-35deg] z-10"></div>
                 <div className="absolute top-200 right-[-170px] w-200 h-[2px] bg-red-900 shadow-[0_0_25px_red,0_0_25px_red,0_0_30px_red,0_0_60px_red] rotate-[-35deg] z-10 opacity-70"></div>
                 <div className="absolute top-200 right-[-194px] w-200 h-[2px] bg-red-900 shadow-[0_0_25px_red,0_0_25px_red,0_0_30px_red,0_0_60px_red] rotate-[-35deg] z-10 opacity-70"></div>
 

@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from 'recharts';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useUserManagementStore } from '../store/useUserManagementStore.js';
 import { useAuthStore } from '../../auth/store/authStore.js';
 import { useUIStore } from '../../auth/store/uiStore.js';
@@ -8,6 +8,8 @@ import { CreateUserModal } from './CreateUserModal.jsx';
 import { UserDetailModal } from './UserDetailModal.jsx';
 import { showError } from '../../../shared/utils/toast.js';
 import { showSuccess } from '../../../shared/utils/toast.js';
+import { getBankProfiles } from '../../../shared/apis/bank.js';
+import { getOperationalAccount } from '../../../shared/apis/coreBanking.js';
 const PAGE_SIZE = 5;
 
 export const Users = () => {
@@ -40,9 +42,82 @@ export const Users = () => {
   const [newUserError, setNewUserError] = useState('');
   const [newUserSuccess, setNewUserSuccess] = useState('');
   const [systemActivities, setSystemActivities] = useState([]);
+  const [bankData, setBankData] = useState([]);
+  const [totalBankBalance, setTotalBankBalance] = useState(0);
+  
+  const loadBankData = useCallback(async () => {
+    try {
+      const response = await getBankProfiles();
+      console.log('Respuesta del banco:', response);
+      
+      // Extraer los perfiles correctamente
+      const profiles = Array.isArray(response) ? response : (response.profiles || []);
+      
+      let total = 0;
+      const dataByProfile = [];
+      
+      // Para cada perfil, obtener el saldo de sus cuentas
+      for (const profile of profiles) {
+        let profileBalance = 0;
+        
+        // Obtener saldo de cada cuenta
+        if (profile.accountNumbers && Array.isArray(profile.accountNumbers)) {
+          for (const accountNumber of profile.accountNumbers) {
+            try {
+              const accountData = await getOperationalAccount(accountNumber);
+              const balance = accountData.account?.balance || 0;
+              profileBalance += balance;
+            } catch (err) {
+              console.error(`Error al obtener cuenta ${accountNumber}:`, err);
+            }
+          }
+        }
+        
+        if (profileBalance > 0) {
+          total += profileBalance;
+          
+          // Buscar el nombre del usuario en la lista de usuarios
+          const user = users.find(u => u.id === profile.userId);
+          const userName = user?.name || `${user?.surname || ''}`.trim() || profile.userId;
+          
+          dataByProfile.push({
+            name: userName,
+            balance: profileBalance,
+            userId: profile.userId
+          });
+        }
+      }
+      
+      // Ordenar por saldo descendente
+      dataByProfile.sort((a, b) => b.balance - a.balance);
+      
+      console.log('Datos para gráfica:', dataByProfile);
+      console.log('Total:', total);
+      
+      setTotalBankBalance(total);
+      setBankData(dataByProfile.slice(0, 5));
+    } catch (err) {
+      console.error('Error al cargar datos del banco:', err);
+      setBankData([]);
+    }
+  }, [users]);
+  
   useEffect(() => {
     getAllUsers();
   }, [getAllUsers]);
+
+  useEffect(() => {
+    if (users.length > 0) {
+      loadBankData();
+    }
+  }, [users, loadBankData]);
+
+  useEffect(() => {
+    if (systemActivities.length === 0 && users.length > 0) {
+      setSystemActivities(getRecentActivities());
+    }
+  }, [users, systemActivities.length]);
+
   useEffect(() => {
     if (usersError) {
       showError(usersError);
@@ -80,6 +155,18 @@ export const Users = () => {
     if (res.success) {
       showSuccess('Usuario creado. Se envió correo de verificación.');
       setOpenCreateModal(false);
+      setSystemActivities((prev) => [
+        {
+          user: {
+            name: formData.name || formData.username,
+            username: formData.username,
+          },
+          action: 'Usuario creado',
+          actionColor: 'text-emerald-400',
+          time: new Date().toLocaleString(),
+        },
+        ...prev,
+      ].slice(0, 10));
       await getAllUsers(undefined, { force: true });
       return true;
     }
@@ -166,6 +253,15 @@ export const Users = () => {
       onConfirm: async () => {
         const res = await toggleUserStatus(user);
         if (res.success) {
+          setSystemActivities((prev) => [
+            {
+              user,
+              action: isCurrentlyEnabled ? 'Usuario deshabilitado' : 'Usuario habilitado',
+              actionColor: isCurrentlyEnabled ? 'text-slate-500' : 'text-emerald-400',
+              time: new Date().toLocaleString(),
+            },
+            ...prev,
+          ].slice(0, 10));
           showSuccess(`Usuario ${isCurrentlyEnabled ? 'deshabilitado' : 'habilitado'} correctamente.`);
         } else {
           showError(res.error || `No se pudo ${action} el usuario`);
@@ -183,12 +279,6 @@ export const Users = () => {
       time: 'Recientemente',
     }));
   };
-
-  const recentActivities = getRecentActivities();
-
-  useEffect(() => {
-    setSystemActivities(getRecentActivities());
-  }, [users]);
 
   const getAvatarColor = (index) => {
     const colors = ['bg-blue-600', 'bg-purple-600', 'bg-pink-600', 'bg-orange-600', 'bg-green-600'];
@@ -236,30 +326,37 @@ export const Users = () => {
   </div>
   <div className='hidden lg:flex flex-col gap-4'>
     <div className='bg-white/5 rounded-xl p-4 h-full flex flex-col'>
-      <h3 className='text-sm text-slate-300 mb-4 text-left'>
-        Actividad reciente
+      <h3 className='text-sm text-slate-300 mb-2 text-left'>
+         Dinero Total en el Banco
       </h3>
-      <ul className='text-sm text-slate-200 space-y-4 overflow-y-auto'>
-
-        {recentActivities.map((activity, idx) => (
-          <li key={`${activity.user.id}-${idx}`} className='flex  gap-3'>
-
-            <div className={`h-8 w-8 rounded-full ${getAvatarColor(idx)} flex items-center justify-center text-xs text-white font-semibold flex-shrink-0`}>
-              {activity.user.name
-                ? activity.user.name.charAt(0).toUpperCase()
-                : 'U'}
-            </div>
-            <div className='flex-1 min-w-0'>
-              <div className='text-sm font-semibold text-white truncate'>
-                {activity.user.name || activity.user.username}
-              </div>
-              <div className={`text-xs ${activity.actionColor}`}>
-                {activity.action}
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className='text-2xl font-bold text-green-400 mb-4'>
+        $ {totalBankBalance.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </div>
+      <div className='flex-1'>
+        {bankData.length > 0 ? (
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={bankData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fontSize: 12, fill: '#9ca3af' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#9ca3af' }} />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: '#1f2937',
+                  border: '1px solid #374151',
+                  borderRadius: '0.5rem',
+                  color: '#ffffff'
+                }}
+                formatter={(value) => `$ ${value.toLocaleString('es-GT', { minimumFractionDigits: 2 })}`}
+              />
+              <Bar dataKey="balance" fill="#ffffff" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className='h-48 flex items-center justify-center text-slate-400'>
+            Cargando datos del banco...
+          </div>
+        )}
+      </div>
     </div>
   </div>
 </div>

@@ -6,6 +6,7 @@ import { normalizeUserModel } from '../../../shared/utils/user.js';
 
 export const HomePage = () => {
     const rawAuthUser = useAuthStore((s) => s.user);
+    const bankProfileUpdatedAt = useAuthStore((s) => s.bankProfileUpdatedAt);
     const authUser = useMemo(() => normalizeUserModel(rawAuthUser) || rawAuthUser, [rawAuthUser]);
 
     const [bankProfile, setBankProfile] = useState(null);
@@ -24,6 +25,12 @@ export const HomePage = () => {
         });
     };
 
+    const formatMoney = (value, currency = 'GTQ') => {
+        const amount = formatAmount(value);
+        const normalizedCurrency = currency?.toString().toUpperCase() || 'GTQ';
+        return `${normalizedCurrency} ${amount}`;
+    };
+
     const movementLabel = (movement) => {
         if (!movement) return '';
         if (movement.type === 'DEPOSIT') return 'Depósito';
@@ -39,36 +46,98 @@ export const HomePage = () => {
         setLoadingAccounts(true);
         try {
             const response = await getBankProfileByUserId(userId);
+            console.log('[HomePage] loadBankProfile response:', response);
+            
+            if (!response) {
+                setBankProfile(null);
+                return;
+            }
+
             const profile = response.profile;
             setBankProfile(profile);
 
             if (profile?.accountNumbers?.length > 0) {
                 const details = {};
-                await Promise.all(
-                    profile.accountNumbers.map(async (accountNumber) => {
-                        try {
-                            const res = await getOperationalAccount(accountNumber);
-                            details[accountNumber] = res.account || {};
-                        } catch {
-                            details[accountNumber] = null;
-                        }
-                    })
-                );
+                // limit concurrent requests to avoid 429 from core-banking
+                const concurrency = 3;
+                for (let i = 0; i < profile.accountNumbers.length; i += concurrency) {
+                    const chunk = profile.accountNumbers.slice(i, i + concurrency);
+                    await Promise.all(
+                        chunk.map(async (accountNumber) => {
+                            try {
+                                const res = await getOperationalAccount(accountNumber);
+                                details[accountNumber] = res.account || {};
+                            } catch (error) {
+                                console.error('[HomePage] loadBankProfile getOperationalAccount failed for', accountNumber, error);
+                                details[accountNumber] = null;
+                            }
+                        })
+                    );
+
+                    // small pause between chunks to be kinder with rate limits
+                    await new Promise((r) => setTimeout(r, 150));
+                }
+
                 setAccountDetails(details);
+                console.log('[HomePage] loadBankProfile details:', details);
+                console.log('[HomePage] loadBankProfile balances:',
+                    profile.accountNumbers.map((accountNumber) => ({
+                        accountNumber,
+                        balance: details[accountNumber]?.balance,
+                        currency: details[accountNumber]?.currency,
+                    }))
+                );
             }
         } catch (err) {
-            if (err.response?.status === 404) {
-                setBankProfile(null);
-            }
+            console.error('[HomePage] Error al cargar perfil bancario:', err);
         } finally {
             setLoadingAccounts(false);
         }
     };
 
+
     useEffect(() => {
         if (authUser) {
             loadBankProfile();
         }
+    }, [authUser]);
+
+    useEffect(() => {
+        if (!authUser) return;
+        if (!bankProfileUpdatedAt) return;
+
+        console.log('[HomePage] bankProfileUpdatedAt changed, reloading profile:', bankProfileUpdatedAt);
+        loadBankProfile();
+    }, [authUser, bankProfileUpdatedAt]);
+
+    useEffect(() => {
+        const handleBankProfileUpdated = (event) => {
+            console.log('[HomePage] bankProfileUpdated event received:', event?.detail);
+            const updatedAccounts = event?.detail?.updatedAccounts;
+            if (Array.isArray(updatedAccounts) && updatedAccounts.length > 0) {
+                setAccountDetails((prev) => {
+                    const next = { ...prev };
+                    updatedAccounts.forEach((account) => {
+                        if (!account?.accountNumber) return;
+                        next[account.accountNumber] = {
+                            ...next[account.accountNumber],
+                            ...account,
+                        };
+                    });
+                    console.log('[HomePage] updated accountDetails after event:', next);
+                    return next;
+                });
+                return;
+            }
+
+            console.log('[HomePage] bankProfileUpdated event had no updatedAccounts, reloading full profile');
+            if (authUser) {
+                loadBankProfile();
+            }
+        };
+
+        window.addEventListener('bankProfileUpdated', handleBankProfileUpdated);
+        return () => window.removeEventListener('bankProfileUpdated', handleBankProfileUpdated);
     }, [authUser]);
 
     const handleToggleAccount = async (accountNumber) => {
@@ -107,6 +176,30 @@ export const HomePage = () => {
         };
     }, [bankProfile, accountDetails, movementsCache]);
 
+    const currencyTotals = useMemo(() => {
+      const accountNumbers = bankProfile?.accountNumbers || [];
+      const totals = { GTQ: 0, USD: 0, EUR: 0 };
+      accountNumbers.forEach((accountNumber) => {
+        const acc = accountDetails[accountNumber];
+        const curr = (acc?.currency || bankProfile?.preferredCurrency || 'GTQ').toString().toUpperCase();
+        const bal = Number(acc?.balance || 0);
+        if (totals[curr] !== undefined) totals[curr] += bal;
+        else totals[curr] = (totals[curr] || 0) + bal;
+      });
+      return totals;
+    }, [bankProfile, accountDetails]);
+
+    const currencyTypes = useMemo(() => {
+      const accountNumbers = bankProfile?.accountNumbers || [];
+      const types = new Set();
+      accountNumbers.forEach((accountNumber) => {
+        const account = accountDetails[accountNumber];
+        const currency = (account?.currency || bankProfile?.preferredCurrency || 'GTQ').toString().toUpperCase();
+        types.add(currency);
+      });
+      return Array.from(types);
+    }, [bankProfile, accountDetails]);
+
     if (!authUser) return <p className='text-slate-200'>Cargando tu inicio...</p>;
 
     return (
@@ -125,35 +218,35 @@ export const HomePage = () => {
                         <h2 className='text-xl font-semibold text-white'>Tus cuentas</h2>
                     </div>
                 </div>
-
                 <div className='mt-3 grid gap-2 md:grid-cols-3'>
                     <div className='rounded-2xl border border-slate-700 bg-slate-950/70 p-3'>
-                        <p className='text-[10px] uppercase tracking-[0.18em] text-slate-500'>
-                            Cuentas activas
-                        </p>
-                        <p className='mt-2 text-2xl font-semibold text-white'>
-                            {accountSummary.totalAccounts || 0}
-                        </p>
+                        <p className='text-[10px] uppercase tracking-[0.18em] text-slate-500'>GTQ</p>
+                        <p className='mt-2 text-2xl font-semibold text-white'>{formatMoney(currencyTotals.GTQ, 'GTQ')}</p>
                     </div>
 
                     <div className='rounded-2xl border border-slate-700 bg-slate-950/70 p-3'>
-                        <p className='text-[10px] uppercase tracking-[0.18em] text-slate-500'>
-                            Saldo total
-                        </p>
-                        <p className='mt-2 text-2xl font-semibold text-white'>
-                            $ {formatAmount(accountSummary.totalBalance)}
-                        </p>
+                        <p className='text-[10px] uppercase tracking-[0.18em] text-slate-500'>USD</p>
+                        <p className='mt-2 text-2xl font-semibold text-white'>{formatMoney(currencyTotals.USD, 'USD')}</p>
                     </div>
 
                     <div className='rounded-2xl border border-slate-700 bg-slate-950/70 p-3'>
-                        <p className='text-[10px] uppercase tracking-[0.18em] text-slate-500'>
-                            Movimientos visibles
-                        </p>
-                        <p className='mt-2 text-2xl font-semibold text-white'>
-                            {accountSummary.totalDeposits + accountSummary.totalExpenses}
-                        </p>
+                        <p className='text-[10px] uppercase tracking-[0.18em] text-slate-500'>EUR</p>
+                        <p className='mt-2 text-2xl font-semibold text-white'>{formatMoney(currencyTotals.EUR, 'EUR')}</p>
                     </div>
                 </div>
+
+                {currencyTypes.length > 0 && (
+                  <div className='mt-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4 text-sm text-slate-200'>
+                    <p className='text-xs uppercase tracking-[0.18em] text-slate-500'>Monedas activas en tus cuentas</p>
+                    <div className='mt-2 flex flex-wrap gap-2'>
+                      {currencyTypes.map((type) => (
+                        <span key={type} className='rounded-full bg-slate-900/90 px-3 py-1 text-xs text-slate-200'>
+                          {type}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className='mt-4 space-y-3'>
   {loadingAccounts ? (
@@ -190,7 +283,7 @@ export const HomePage = () => {
                 </p>
 
                 <p className='mt-1 text-lg font-semibold text-white'>
-                  $ {formatAmount(detail?.balance ?? 0)}
+                  {formatMoney(detail?.balance ?? 0, detail?.currency || bankProfile?.preferredCurrency || 'GTQ')}
                 </p>
               </div>
 
@@ -293,7 +386,7 @@ export const HomePage = () => {
                             movement.type === 'TRANSFER_IN'
                               ? '+'
                               : '-'}
-                            {formatAmount(movement.amount)}{' '}
+                            Q {formatAmount(movement.amount)}{' '}
                             {movement.currency ||
                               detail?.currency ||
                               'GTQ'}

@@ -1,8 +1,10 @@
 import { axiosConversion } from './api.js';
 
-export const convertCurrency = async ({ from, to, amount, description }) => {
+export const convertCurrency = async ({ from, to, amount, description, accountNumber, destinationAccountNumber }) => {
   const payload = { from, to, amount };
   if (description) payload.description = description;
+  if (accountNumber) payload.accountNumber = accountNumber;
+  if (destinationAccountNumber) payload.destinationAccountNumber = destinationAccountNumber;
   const { data } = await axiosConversion.post('/conversions/convert', payload);
   const result = data.result || {};
 

@@ -40,16 +40,21 @@ export const TransactionsPage = () => {
       const details = {};
 
       if (profile?.accountNumbers?.length > 0) {
-        await Promise.all(
-          profile.accountNumbers.map(async (accountNumber) => {
-            try {
-              const res = await getOperationalAccount(accountNumber);
-              details[accountNumber] = res.account || {};
-            } catch {
-              details[accountNumber] = null;
-            }
-          })
-        );
+        const batchSize = 3;
+        for (let i = 0; i < profile.accountNumbers.length; i += batchSize) {
+          const batch = profile.accountNumbers.slice(i, i + batchSize);
+          await Promise.all(
+            batch.map(async (accountNumber) => {
+              try {
+                const res = await getOperationalAccount(accountNumber);
+                details[accountNumber] = res.account || {};
+              } catch {
+                details[accountNumber] = null;
+              }
+            })
+          );
+          await new Promise((resolve) => setTimeout(resolve, 120));
+        }
       }
 
       setAccountDetails(details);

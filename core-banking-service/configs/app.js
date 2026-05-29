@@ -44,7 +44,15 @@ const middlewares = (app) => {
     app.options('*', cors(corsOptions));
     app.use(helmet(helmetOptions));
     app.use(morgan('dev'));
-    app.use(requestLimit);
+    const exemptPaths = [
+        `${BASE_PATH}/health`,
+        `${BASE_PATH}/api-docs`
+    ];
+
+    app.use((req, res, next) => {
+        if (exemptPaths.some(p => req.originalUrl.startsWith(p))) return next();
+        return requestLimit(req, res, next);
+    });
 };
 
 export const initServer = async () => {

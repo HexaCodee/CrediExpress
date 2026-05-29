@@ -135,8 +135,6 @@ export const ProfilePage = () => {
             </div>
             <div className='space-y-1'>
               <p className='text-xl font-semibold text-white'>{[authUser.name || authUser.Name, authUser.surname || authUser.Surname].filter(Boolean).join(' ') || authUser.username || authUser.Username}</p>
-              <p className='text-sm text-slate-400'>{authUser.email || authUser.Email || 'Sin correo registrado'}</p>
-              <p className='text-sm text-slate-400'>Rol: {authUser.role || authUser.Role || 'Usuario'}</p>
             </div>
           </div>
           <div>

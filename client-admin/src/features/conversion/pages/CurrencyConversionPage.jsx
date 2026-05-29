@@ -95,21 +95,26 @@ export const CurrencyConversionPage = () => {
       const accountNumbers = Array.isArray(profile?.accountNumbers) ? profile.accountNumbers : [];
 
       const loadedAccounts = [];
-      await Promise.all(
-        accountNumbers.map(async (accountNumber) => {
-          try {
-            const res = await getOperationalAccount(accountNumber);
-            loadedAccounts.push({
-              accountNumber,
-              currency: res.account?.currency || profile.preferredCurrency || 'GTQ',
-              balance: Number(res.account?.balance ?? 0),
-              status: res.account?.status || 'ACTIVA',
-            });
-          } catch {
-            loadedAccounts.push({ accountNumber, currency: profile.preferredCurrency || 'GTQ', balance: 0, status: 'ACTIVA' });
-          }
-        })
-      );
+      const batchSize = 3;
+      for (let i = 0; i < accountNumbers.length; i += batchSize) {
+        const batch = accountNumbers.slice(i, i + batchSize);
+        await Promise.all(
+          batch.map(async (accountNumber) => {
+            try {
+              const res = await getOperationalAccount(accountNumber);
+              loadedAccounts.push({
+                accountNumber,
+                currency: res.account?.currency || profile.preferredCurrency || 'GTQ',
+                balance: Number(res.account?.balance ?? 0),
+                status: res.account?.status || 'ACTIVA',
+              });
+            } catch {
+              loadedAccounts.push({ accountNumber, currency: profile.preferredCurrency || 'GTQ', balance: 0, status: 'ACTIVA' });
+            }
+          })
+        );
+        await new Promise((resolve) => setTimeout(resolve, 120));
+      }
 
       setAccounts(loadedAccounts);
       console.log('[Conversion] loadAccounts loaded:', loadedAccounts.map(a => ({ accountNumber: a.accountNumber, balance: a.balance, currency: a.currency })));
@@ -128,21 +133,28 @@ export const CurrencyConversionPage = () => {
 
     try {
       console.log('[Conversion] refreshAccounts request for:', accountNumbers);
-      const updatedAccounts = await Promise.all(
-        accountNumbers.map(async (accountNumber) => {
-          try {
-            const res = await getOperationalAccount(accountNumber);
-            return {
-              accountNumber,
-              currency: res.account?.currency || 'GTQ',
-              balance: Number(res.account?.balance ?? 0),
-              status: res.account?.status || 'ACTIVA',
-            };
-          } catch {
-            return null;
-          }
-        })
-      );
+      const batchSize = 3;
+      const updatedAccounts = [];
+      for (let i = 0; i < accountNumbers.length; i += batchSize) {
+        const batch = accountNumbers.slice(i, i + batchSize);
+        const batchResults = await Promise.all(
+          batch.map(async (accountNumber) => {
+            try {
+              const res = await getOperationalAccount(accountNumber);
+              return {
+                accountNumber,
+                currency: res.account?.currency || 'GTQ',
+                balance: Number(res.account?.balance ?? 0),
+                status: res.account?.status || 'ACTIVA',
+              };
+            } catch {
+              return null;
+            }
+          })
+        );
+        updatedAccounts.push(...batchResults.filter(Boolean));
+        await new Promise((resolve) => setTimeout(resolve, 120));
+      }
 
       setAccounts((prevAccounts) =>
         prevAccounts.map((account) => {

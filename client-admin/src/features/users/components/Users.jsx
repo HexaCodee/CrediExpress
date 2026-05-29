@@ -60,16 +60,23 @@ export const Users = () => {
       for (const profile of profiles) {
         let profileBalance = 0;
         
-        // Obtener saldo de cada cuenta
+        // Obtener saldo de cada cuenta con límite de concurrencia para evitar 429
         if (profile.accountNumbers && Array.isArray(profile.accountNumbers)) {
-          for (const accountNumber of profile.accountNumbers) {
-            try {
-              const accountData = await getOperationalAccount(accountNumber);
-              const balance = accountData.account?.balance || 0;
-              profileBalance += balance;
-            } catch (err) {
-              console.error(`Error al obtener cuenta ${accountNumber}:`, err);
-            }
+          const batchSize = 3;
+          for (let i = 0; i < profile.accountNumbers.length; i += batchSize) {
+            const batch = profile.accountNumbers.slice(i, i + batchSize);
+            await Promise.all(
+              batch.map(async (accountNumber) => {
+                try {
+                  const accountData = await getOperationalAccount(accountNumber);
+                  const balance = accountData.account?.balance || 0;
+                  profileBalance += balance;
+                } catch (err) {
+                  console.error(`Error al obtener cuenta ${accountNumber}:`, err);
+                }
+              })
+            );
+            await new Promise((resolve) => setTimeout(resolve, 120));
           }
         }
         

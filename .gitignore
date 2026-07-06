@@ -28,6 +28,9 @@
 appsettings.json
 pg/
 
+## [ASP.NET Data Protection keys - auto-generated, machine-specific]
+**/keys/*.xml
+
 ## [Logs]
 *.log
 logs/

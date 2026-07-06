@@ -12,6 +12,7 @@
 		"dev:dotnet:auth": "dotnet run --project authentication-service/auth-service/src/AuthService.Api/AuthService.Api.csproj --launch-profile http",
 		"dev:dotnet:log": "dotnet run --project login-service/log-service/src/LogService.Api/LogService.Api.csproj --launch-profile http",
 		"dev": "node scripts/dev.mjs",
+		"dev:terminals": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-terminals.ps1",
 		"stop": "node scripts/stop.mjs",
 		"format": "prettier . --write",
 		"format:check": "prettier . --check"

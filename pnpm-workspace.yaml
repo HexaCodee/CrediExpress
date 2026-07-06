@@ -7,3 +7,4 @@ packages:
   - product-currency-service
   - role-node
   - client-admin
+  - client-user

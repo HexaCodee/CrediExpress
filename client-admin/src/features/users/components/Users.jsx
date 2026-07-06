@@ -45,7 +45,7 @@ export const Users = () => {
   const [bankData, setBankData] = useState([]);
   const [totalBankBalance, setTotalBankBalance] = useState(0);
   
-  const loadBankData = useCallback(async () => {
+  const loadBankData = useCallback(async (signal) => {
     try {
       const response = await getBankProfiles();
       console.log('Respuesta del banco:', response);
@@ -68,10 +68,13 @@ export const Users = () => {
             await Promise.all(
               batch.map(async (accountNumber) => {
                 try {
-                  const accountData = await getOperationalAccount(accountNumber);
+                  const accountData = await getOperationalAccount(accountNumber, { signal });
                   const balance = accountData.account?.balance || 0;
                   profileBalance += balance;
                 } catch (err) {
+                  if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
+                    return;
+                  }
                   console.error(`Error al obtener cuenta ${accountNumber}:`, err);
                 }
               })
@@ -115,8 +118,11 @@ export const Users = () => {
 
   useEffect(() => {
     if (users.length > 0) {
-      loadBankData();
+      const controller = new AbortController();
+      loadBankData(controller.signal);
+      return () => controller.abort();
     }
+    return undefined;
   }, [users, loadBankData]);
 
   useEffect(() => {

@@ -2,6 +2,7 @@ using System;
 using AuthService.Application.DTOs;
 using AuthService.Application.DTOs.Email;
 using AuthService.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.VisualBasic;
@@ -13,6 +14,9 @@ namespace AuthService.Api.Controllers;
 [Produces("application/json")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
+    // El banco es quien da de alta clientes (vía el panel admin), no un
+    // auto-registro público: solo un caller autenticado puede llamar esto.
+    [Authorize]
     [HttpPost("register")]
     [RequestSizeLimit(10 * 1024 * 1024)]
     [EnableRateLimiting("AuthPolicy")]

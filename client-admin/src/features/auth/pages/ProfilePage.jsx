@@ -76,8 +76,15 @@ export const ProfilePage = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    // Prevent users from modifying profilePicture directly
-    if (name === 'profilePicture') return;
+
+    if (name === 'profilePicture') {
+      const file = files?.[0];
+      if (!file) return;
+      setForm((prev) => ({ ...prev, profilePicture: file }));
+      setPreview(URL.createObjectURL(file));
+      return;
+    }
+
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -205,7 +212,16 @@ export const ProfilePage = () => {
               Teléfono
               <input name='phone' value={form.phone} onChange={handleChange} className='w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white' />
             </label>
-            {/* Users cannot change profile picture here; controlled by admins */}
+            <label className='space-y-2 text-sm text-slate-300'>
+              Foto de perfil
+              <input
+                name='profilePicture'
+                type='file'
+                accept='image/*'
+                onChange={handleChange}
+                className='w-full rounded-2xl border border-slate-700 bg-slate-950 px-4 py-3 text-white'
+              />
+            </label>
           </div>
 
           {message && <div className='rounded-2xl border border-slate-600 bg-slate-800/60 px-4 py-3 text-sm text-slate-200'>{message}</div>}

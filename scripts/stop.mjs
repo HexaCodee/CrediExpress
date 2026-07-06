@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const workspaceRoot = path.resolve(scriptDir, '..');
-const servicePorts = [3002, 3003, 3004, 3006, 3007, 3008, 3009, 5062, 5173, 5174, 5222];
+const servicePorts = [3002, 3003, 3004, 3006, 3007, 3008, 3009, 5062, 5173, 5174, 5222, 8081];
 
 function run(command, args, { allowFailure = false } = {}) {
   const result = spawnSync(command, args, {

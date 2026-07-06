@@ -20,11 +20,21 @@ export const getRecentMovements = async (accountNumber, limit) => {
   return data;
 };
 
-export const getOperationalAccount = async (accountNumber) => {
-  const { data } = await axiosCoreBanking.get(
-    `/core-banking/accounts/${accountNumber}?_=${Date.now()}`
-  );
-  return data;
+export const getOperationalAccount = async (accountNumber, config = {}) => {
+  try {
+    const { data } = await axiosCoreBanking.get(
+      `/core-banking/accounts/${accountNumber}`,
+      config
+    );
+    return data;
+  } catch (err) {
+    // If the account was deleted or doesn't exist the backend may return 404.
+    // Return a safe default so callers can continue aggregations without throwing.
+    if (err?.response?.status === 404) {
+      return { account: null };
+    }
+    throw err;
+  }
 };
 
 export const getAccountOverview = async (accountNumber) => {

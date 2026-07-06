@@ -21,8 +21,12 @@ public class CloudinaryService(IConfiguration configuration) : ICloudinaryServic
             var folder = configuration["CloudinarySettings:Folder"] ?? "auth_service/profiles";
             var uploadParams = new ImageUploadParams
             {
+                // PublicId no debe incluir el folder: Cloudinary ya lo antepone
+                // por la propiedad Folder. Ponerlo en ambos duplicaba la ruta
+                // real (ej. ".../profiles/profiles/...") y la URL que la app
+                // reconstruye después (folder una sola vez) terminaba en 404.
                 File = new FileDescription(imageFile.FileName, stream),
-                PublicId = $"{folder}/{fileName}",
+                PublicId = fileName,
                 Folder = folder,
                 Transformation = new Transformation()
                     .Width(400)

@@ -1,0 +1,40 @@
+{
+  "name": "client-user",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start --offline",
+    "start:online": "expo start",
+    "start:clean": "expo start --offline --clear",
+    "android": "expo start --offline --android",
+    "ios": "expo start --offline --ios",
+    "web": "expo start --offline --web",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^15.1.1",
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-navigation/bottom-tabs": "^7.18.7",
+    "@react-navigation/native": "^7.3.7",
+    "@react-navigation/native-stack": "^7.17.7",
+    "axios": "^1.18.1",
+    "expo": "54.0.35",
+    "expo-image-picker": "~17.0.11",
+    "expo-secure-store": "15.0.8",
+    "expo-splash-screen": "31.0.13",
+    "expo-status-bar": "3.0.9",
+    "react": "19.1.0",
+    "react-hook-form": "^7.80.0",
+    "react-native": "0.81.5",
+    "react-native-safe-area-context": "5.6.0",
+    "react-native-screens": "4.16.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "babel-preset-expo": "54.0.11",
+    "eslint": "^9.19.0",
+    "eslint-config-expo": "10.0.0"
+  }
+}

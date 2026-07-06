@@ -27,44 +27,6 @@ const router = Router();
 
 /**
  * @swagger
- * /core-banking/accounts:
- *   get:
- *     summary: Lista cuentas operacionales
- *     tags: [CoreBanking]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Cuentas operacionales obtenidas correctamente
- */
-router.get('/accounts', [validateJWT, isAdminRole], getOperationalAccounts);
-
-/**
- * @swagger
- * /core-banking/accounts/{accountNumber}:
- *   get:
- *     summary: Obtiene una cuenta operacional por numero
- *     tags: [CoreBanking]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: accountNumber
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Cuenta operacional obtenida correctamente
- */
-router.get('/accounts/:accountNumber', [
-    validateJWT,
-    check('accountNumber', 'No. cuenta inválido').isLength({ min: 8, max: 20 }),
-    checkValidators,
-], getOperationalAccount);
-
-/**
- * @swagger
  * /core-banking/accounts/register:
  *   post:
  *     summary: Registra una cuenta operacional
@@ -103,6 +65,44 @@ router.post('/accounts/register', [
     check('balance', 'balance debe ser >= 0').optional().isFloat({ min: 0 }),
     checkValidators,
 ], registerOperationalAccount);
+
+/**
+ * @swagger
+ * /core-banking/accounts:
+ *   get:
+ *     summary: Lista cuentas operacionales
+ *     tags: [CoreBanking]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Cuentas operacionales obtenidas correctamente
+ */
+router.get('/accounts', [validateJWT, isAdminRole], getOperationalAccounts);
+
+/**
+ * @swagger
+ * /core-banking/accounts/{accountNumber}:
+ *   get:
+ *     summary: Obtiene una cuenta operacional por numero
+ *     tags: [CoreBanking]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: accountNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Cuenta operacional obtenida correctamente
+ */
+router.get('/accounts/:accountNumber', [
+    validateJWT,
+    check('accountNumber', 'No. cuenta inválido').isLength({ min: 8, max: 20 }),
+    checkValidators,
+], getOperationalAccount);
 
 /**
  * @swagger
@@ -200,34 +200,6 @@ router.patch('/deposits/:transactionId/reverse', [
     checkValidators,
 ], reverseDeposit);
 
-/**
- * @swagger
- * /core-banking/transfers:
- *   post:
- *     summary: Realiza una transferencia
- *     tags: [CoreBanking]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [fromAccountNumber, toAccountNumber, amount]
- *             properties:
- *               fromAccountNumber:
- *                 type: string
- *               toAccountNumber:
- *                 type: string
- *               amount:
- *                 type: number
- *               description:
- *                 type: string
- *     responses:
- *       201:
- *         description: Transferencia creada correctamente
- */
 router.post('/transfers', [
     validateJWT,
     check('fromAccountNumber', 'fromAccountNumber inválido').isLength({ min: 8, max: 20 }),
@@ -236,6 +208,30 @@ router.post('/transfers', [
     check('description', 'description debe tener máximo 250 caracteres').optional().isLength({ max: 250 }),
     checkValidators,
 ], createTransfer);
+
+/**
+ * @swagger
+ * /core-banking/transfers/usage/{accountNumber}/today:
+ *   get:
+ *     summary: Obtiene uso diario de transferencias
+ *     tags: [CoreBanking]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: accountNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Uso diario obtenido correctamente
+ */
+router.get('/transfers/usage/:accountNumber/today', [
+    validateJWT,
+    check('accountNumber', 'No. cuenta inválido').isLength({ min: 8, max: 20 }),
+    checkValidators,
+], getTransferUsageToday);
 
 /**
  * @swagger
@@ -391,30 +387,6 @@ router.delete('/favorites/:favoriteId', [
 
 /**
  * @swagger
- * /core-banking/history/account/{accountNumber}:
- *   get:
- *     summary: Obtiene historial por cuenta
- *     tags: [CoreBanking]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: accountNumber
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Historial obtenido correctamente
- */
-router.get('/history/account/:accountNumber', [
-    validateJWT,
-    check('accountNumber', 'No. cuenta inválido').isLength({ min: 8, max: 20 }),
-    checkValidators,
-], getHistoryByAccount);
-
-/**
- * @swagger
  * /core-banking/history/account/{accountNumber}/recent:
  *   get:
  *     summary: Obtiene movimientos recientes por cuenta
@@ -439,9 +411,9 @@ router.get('/history/account/:accountNumber/recent', [
 
 /**
  * @swagger
- * /core-banking/transfers/usage/{accountNumber}/today:
+ * /core-banking/history/account/{accountNumber}:
  *   get:
- *     summary: Obtiene uso diario de transferencias
+ *     summary: Obtiene historial por cuenta
  *     tags: [CoreBanking]
  *     security:
  *       - bearerAuth: []
@@ -453,13 +425,13 @@ router.get('/history/account/:accountNumber/recent', [
  *           type: string
  *     responses:
  *       200:
- *         description: Uso diario obtenido correctamente
+ *         description: Historial obtenido correctamente
  */
-router.get('/transfers/usage/:accountNumber/today', [
+router.get('/history/account/:accountNumber', [
     validateJWT,
     check('accountNumber', 'No. cuenta inválido').isLength({ min: 8, max: 20 }),
     checkValidators,
-], getTransferUsageToday);
+], getHistoryByAccount);
 
 /**
  * @swagger

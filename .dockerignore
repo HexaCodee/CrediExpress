@@ -1,0 +1,17 @@
+# Used only by client-user's docker build (build context = repo root, needed
+# for pnpm workspace resolution: pnpm must see every workspace member's
+# package.json, so whole service directories are NOT excluded here - only
+# their heavy/sensitive contents are.
+
+**/node_modules/
+**/bin/
+**/obj/
+**/logs/
+**/.git/
+**/.env
+**/.env.*
+!**/.env.example
+appsettings.json
+appsettings.*.json
+crediexpress-stack/
+kinalsports-stack/

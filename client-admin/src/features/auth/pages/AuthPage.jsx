@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react'
 import { LoginForm } from "../components/LoginForm.jsx"
 import { ForgotPassword } from "../components/ForgotPassword.jsx"
+import FondoAuth from "../../../assets/img/FondoAuth.avif"
+import CrediExpressLogo from "../../../assets/img/CrediExpressLogo.png"
+import SeguroIcon from "../../../assets/img/Seguro.png"
+import RapidoIcon from "../../../assets/img/Rapido.png"
+import ConfiableIcon from "../../../assets/img/Confiable.png"
+import IconoLogin from "../../../assets/img/IconoLogin.png"
 
 export const AuthPage = () => {
     const [isForgot, setIsForgot] = useState(false);
@@ -19,7 +25,7 @@ export const AuthPage = () => {
             <section
                 className='min-h-screen flex items-center justify-end bg-cover bg-center bg-no-repeat relative overflow-hidden p-4'
                 style={{
-                    backgroundImage: `linear-gradient(rgba(2 , 6, 23, 0.88),rgba(2, 6, 23, 0.92)), url('/src/assets/img/FondoAuth.avif')`
+                    backgroundImage: `linear-gradient(rgba(2 , 6, 23, 0.88),rgba(2, 6, 23, 0.92)), url('${FondoAuth}')`
                 }}
             >
 
@@ -39,7 +45,7 @@ export const AuthPage = () => {
                         <div className='flex items-center gap-3 rounded-full'>
                             <figure>
                                 <img
-                                    src="/src/assets/img/CrediExpressLogo.png"
+                                    src={CrediExpressLogo}
                                     alt="CrediExpress logo"
                                     className='h-25 w-auto'
                                 />
@@ -69,7 +75,7 @@ export const AuthPage = () => {
                             <article className='flex flex-col items-center gap-3 max-w-[120px]'>
                                 <figure className='p-3 rounded-full'>
                                     <img
-                                        src="/src/assets/img/Seguro.png"
+                                        src={SeguroIcon}
                                         alt="Seguridad"
                                         className='h-25 w-auto drop-shadow-[0_0_12px_rgba(255,0,0,0.9)]'
                                     />
@@ -89,7 +95,7 @@ export const AuthPage = () => {
                             <article className='flex flex-col items-center gap-3 max-w-[120px]'>
                                 <figure className='p-3 rounded-full'>
                                     <img
-                                        src="/src/assets/img/Rapido.png"
+                                        src={RapidoIcon}
                                         alt="Rapidez"
                                         className='h-25 w-auto drop-shadow-[0_0_12px_rgba(255,0,0,0.9)]'
                                     />
@@ -108,7 +114,7 @@ export const AuthPage = () => {
                             <article className='flex flex-col items-center gap-3 max-w-[120px]'>
                                 <figure className='p-3 rounded-full'>
                                     <img
-                                        src="/src/assets/img/Confiable.png"
+                                        src={ConfiableIcon}
                                         alt="Confiable"
                                         className='h-25 w-auto drop-shadow-[0_0_12px_rgba(255,0,0,0.9)]'
                                     />
@@ -131,7 +137,7 @@ export const AuthPage = () => {
                     <header className='text-center mb-8'>
                         <figure>
                             <img
-                                src="/src/assets/img/IconoLogin.png"
+                                src={IconoLogin}
                                 alt="CrediExpress login icon"
                                 className='h-10 w-auto mx-auto mb-4'
                             />

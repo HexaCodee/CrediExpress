@@ -1,4 +1,5 @@
 using System;
+using System.Security.Cryptography;
 using AuthService.Domain.Entities;
 using AuthService.Application.Services;
 using AuthService.Domain.Constants;
@@ -85,7 +86,7 @@ public class DataSeeder
                 ProfilePicture = string.Empty,
                 Phone = "00000000",
                 AccountNumber = UuidGenerator.GenerateShortUUID(),
-                Dpi = string.Empty,
+                Dpi = await GenerateUniqueNumericCodeAsync(context, 13),
                 Address = string.Empty,
                 JobName = string.Empty,
                 MonthlyIncome = 100
@@ -111,5 +112,26 @@ public class DataSeeder
 
         await context.Users.AddAsync(newAdmin);
         await context.SaveChangesAsync();
+    }
+
+    private static async Task<string> GenerateUniqueNumericCodeAsync(ApplicationDbContext context, int length)
+    {
+        while (true)
+        {
+            var digits = new char[length];
+
+            for (var index = 0; index < length; index++)
+            {
+                digits[index] = (char)('0' + RandomNumberGenerator.GetInt32(0, 10));
+            }
+
+            var dpi = new string(digits);
+            var exists = await context.UserProfiles.AnyAsync(userProfile => userProfile.Dpi == dpi);
+
+            if (!exists)
+            {
+                return dpi;
+            }
+        }
     }
 }

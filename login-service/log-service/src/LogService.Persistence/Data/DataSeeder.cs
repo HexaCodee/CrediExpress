@@ -10,9 +10,9 @@ public class DataSeeder
 {
     public static async Task SeedAsync(ApplicationDbContext context)
     {
-        const string adminUsername = "ADMINB";
-        const string adminEmail = "ADMINB@gmail.com";
-        const string adminPassword = "ADMINB";
+        const string adminUsername = "adminb";
+        const string adminEmail = "adminb@local.com";
+        const string adminPassword = "adminb";
 
         if (!context.Roles.Any())
         {
@@ -49,7 +49,7 @@ public class DataSeeder
             .Include(u => u.UserProfile)
             .Include(u => u.UserEmail)
             .Include(u => u.UserRoles)
-            .FirstOrDefaultAsync(u => EF.Functions.ILike(u.Username, adminUsername) || EF.Functions.ILike(u.Email, adminEmail));
+            .FirstOrDefaultAsync(u => u.Username == adminUsername || u.Email == adminEmail);
         var oldAdmin = await context.Users.FirstOrDefaultAsync(u => EF.Functions.ILike(u.Username, "admin") || EF.Functions.ILike(u.Email, "admin@gmail.com"));
 
         var passwordHasher = new PasswordHashService();
@@ -123,7 +123,7 @@ public class DataSeeder
                 UserId = adminUser.Id,
                 ProfilePicture = string.Empty,
                 Phone = "00000000",
-                AccountNumber = string.Empty,
+                AccountNumber = await GenerateUniqueAccountNumberAsync(context),
                 Dpi = await GenerateUniqueNumericCodeAsync(context, 13),
                 Address = string.Empty,
                 JobName = string.Empty,
@@ -132,7 +132,14 @@ public class DataSeeder
 
             adminUser.UserProfile.ProfilePicture = string.Empty;
             adminUser.UserProfile.Phone = "00000000";
-            adminUser.UserProfile.AccountNumber = string.Empty;
+            if (string.IsNullOrEmpty(adminUser.UserProfile.AccountNumber))
+            {
+                adminUser.UserProfile.AccountNumber = await GenerateUniqueAccountNumberAsync(context);
+            }
+            if (string.IsNullOrEmpty(adminUser.UserProfile.Dpi))
+            {
+                adminUser.UserProfile.Dpi = await GenerateUniqueNumericCodeAsync(context, 13);
+            }
             adminUser.UserProfile.Address = string.Empty;
             adminUser.UserProfile.JobName = string.Empty;
             adminUser.UserProfile.MonthlyIncome = 100;
@@ -179,6 +186,20 @@ public class DataSeeder
             if (!exists)
             {
                 return dpi;
+            }
+        }
+    }
+
+    private static async Task<string> GenerateUniqueAccountNumberAsync(ApplicationDbContext context)
+    {
+        while (true)
+        {
+            var accountNumber = Guid.NewGuid().ToString("N")[..12];
+            var exists = await context.UserProfiles.AnyAsync(userProfile => userProfile.AccountNumber == accountNumber);
+
+            if (!exists)
+            {
+                return accountNumber;
             }
         }
     }

@@ -18,6 +18,9 @@ COPY --from=build /app/publish .
 
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV ASPNETCORE_URLS=http://+:5062
+# Evita el FileSystemWatcher de appsettings.json: los contenedores de Render
+# tienen un limite bajo de inotify y no necesitamos recarga de config en caliente
+ENV DOTNET_hostBuilder__reloadConfigOnChange=false
 
 EXPOSE 5062
 

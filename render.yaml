@@ -5,7 +5,7 @@ services:
     name: client-admin
     runtime: static
     rootDir: client-admin
-    buildCommand: corepack enable && corepack prepare pnpm@10 --activate && pnpm install --frozen-lockfile && pnpm build
+    buildCommand: pnpm install --frozen-lockfile && pnpm build
     staticPublishPath: ./dist
     routes:
       - type: rewrite

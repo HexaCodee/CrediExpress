@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /src
+
+COPY LogService.sln ./
+COPY src/LogService.Domain/ src/LogService.Domain/
+COPY src/LogService.Persistence/ src/LogService.Persistence/
+COPY src/LogService.Application/ src/LogService.Application/
+COPY src/LogService.Api/ src/LogService.Api/
+
+RUN dotnet publish src/LogService.Api/LogService.Api.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+
+WORKDIR /app
+
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+ENV ASPNETCORE_URLS=http://+:5062
+
+EXPOSE 5062
+
+ENTRYPOINT ["dotnet", "LogService.Api.dll"]

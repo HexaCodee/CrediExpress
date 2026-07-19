@@ -1,0 +1,43 @@
+Licencia MIT
+
+Derechos de Autor (c) 2026 Braulio Echeverría
+Fundación Kinal, Guatemala — Plan de estudio PESNUM, carrera de Perito en Computación
+Proyecto desarrollado bajo la supervisión del Catedrático (PEM)
+
+Se concede permiso, de forma gratuita, a cualquier persona que obtenga una copia
+de este software y los archivos de documentación asociados (el "Software"), para
+tratar en el Software sin restricción, incluyendo sin limitación los derechos
+de usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o
+vender copias del Software, y para permitir a las personas a quienes se
+proporcione el Software que lo hagan, sujeto a las siguientes condiciones:
+
+El aviso de derechos de autor anterior y este aviso de permiso se incluirán en
+todas las copias o partes sustanciales del Software.
+
+EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O
+IMPLÍCITA, INCLUYENDO PERO NO LIMITADO A GARANTÍAS DE COMERCIABILIDAD,
+IDONEIDAD PARA UN PROPÓSITO PARTICULAR Y NO INFRACCIÓN. EN NINGÚN CASO LOS
+AUTORES O TITULARES DE LOS DERECHOS DE AUTOR SERÁN RESPONSABLES POR NINGÚN
+RECLAMO, DAÑO U OTRA RESPONSABILIDAD, YA SEA EN UNA ACCIÓN DE CONTRATO,
+AGRAVIO O DE OTRA MANERA, QUE SURJA DE O EN CONEXIÓN CON EL SOFTWARE O EL
+USO U OTROS TRATOS EN EL SOFTWARE.
+
+---
+
+NOTAS SOBRE EL PROYECTO ORIGINAL (kinalsports-stack):
+- Este proyecto fue desarrollado con fines educativos
+- Forma parte del plan de estudio PESNUM de la carrera de Perito en Computación de Fundación Kinal (2026)
+- Autor original: Braulio Echeverría
+- Repositorio original: kinalsports-stack (orquestador Docker de la plataforma KinalSports)
+- Es parte de una arquitectura de microservicios educativa
+- Se permite su uso, modificación y distribución respetando esta licencia
+- Se requiere mantención del crédito al autor original
+
+---
+
+NOTA SOBRE ESTA ADAPTACIÓN (crediexpress-stack):
+- Este directorio es una adaptación de kinalsports-stack para orquestar los servicios
+  del proyecto CrediExpress (docker-compose.yml, Dockerfiles y variables de entorno
+  reescritos para la arquitectura y el monorepo de CrediExpress).
+- La licencia MIT y el crédito al autor original (Braulio Echeverría / Fundación Kinal)
+  se mantienen conforme a los términos anteriores.

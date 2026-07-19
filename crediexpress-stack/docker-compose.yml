@@ -1,0 +1,517 @@
+name: crediexpress-stack
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: crediexpress_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-IN6AM}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-In6amKnl!}
+      POSTGRES_DB: ${POSTGRES_DB:-crediexpress}
+      POSTGRES_INITDB_ARGS: --auth-host=md5 --auth-local=trust
+    ports:
+      - "${POSTGRES_PORT:-5436}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-IN6AM} -d ${POSTGRES_DB:-crediexpress}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - crediexpress_network
+
+  mongodb:
+    image: mongo:7
+    container_name: crediexpress_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-In6amKnl!}
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  auth-service:
+    build:
+      context: ../authentication-service/auth-service
+      dockerfile: ../../crediexpress-stack/dockerfiles/Dockerfile.auth-service
+    container_name: crediexpress_auth_service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5222
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      ConnectionStrings__DefaultConnection: >-
+        Host=postgres;Port=5432;Database=${POSTGRES_DB:-crediexpress};
+        Username=${POSTGRES_USER:-IN6AM};Password=${POSTGRES_PASSWORD:-In6amKnl!}
+      AppSettings__FrontendUrl: ${FRONTEND_URL:-http://localhost:5173}
+      AppSettings__AuthServiceUrl: ${AUTH_SERVICE_URL:-http://localhost:5222}
+      JwtSettings__SecretKey: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JwtSettings__Issuer: ${JWT_ISSUER:-CrediExpress}
+      JwtSettings__Audience: ${JWT_AUDIENCE:-CrediExpress}
+      JwtSettings__ExpirationMinutes: ${JWT_EXPIRATION_MINUTES:-60}
+      SmtpSettings__Enabled: ${SMTP_ENABLED:-true}
+      SmtpSettings__Host: ${SMTP_HOST:-smtp.gmail.com}
+      SmtpSettings__Port: ${SMTP_PORT:-465}
+      SmtpSettings__EnableSsl: ${SMTP_ENABLE_SSL:-true}
+      SmtpSettings__Username: ${SMTP_USERNAME:-}
+      SmtpSettings__Password: ${SMTP_PASSWORD:-}
+      SmtpSettings__FromEmail: ${SMTP_FROM:-}
+      SmtpSettings__FromName: ${SMTP_FROM_NAME:-CrediExpress Soporte}
+      SmtpSettings__UseImplicitSsl: ${SMTP_USE_IMPLICIT_SSL:-true}
+      CloudinarySettings__CloudName: ${CLOUDINARY_CLOUD_NAME:-}
+      CloudinarySettings__ApiKey: ${CLOUDINARY_API_KEY:-}
+      CloudinarySettings__ApiSecret: ${CLOUDINARY_API_SECRET:-}
+      CloudinarySettings__BaseUrl: ${CLOUDINARY_BASE_URL:-}
+      CloudinarySettings__Folder: ${CLOUDINARY_FOLDER:-auth_crediexpress/profiles}
+      CloudinarySettings__DefaultAvatarPath: ${CLOUDINARY_DEFAULT_AVATAR_PATH:-avatarDefault.png}
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../authentication-service/auth-service:/src
+      - /src/src/AuthService.Api/bin
+      - /src/src/AuthService.Api/obj
+      - /src/src/AuthService.Application/bin
+      - /src/src/AuthService.Application/obj
+      - /src/src/AuthService.Domain/bin
+      - /src/src/AuthService.Domain/obj
+      - /src/src/AuthService.Persistence/bin
+      - /src/src/AuthService.Persistence/obj
+    ports:
+      - "${AUTH_SERVICE_PORT:-5222}:5222"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5222/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - crediexpress_network
+
+  log-service:
+    build:
+      context: ../login-service/log-service
+      dockerfile: ../../crediexpress-stack/dockerfiles/Dockerfile.log-service
+    container_name: crediexpress_log_service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5062
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
+      ConnectionStrings__DefaultConnection: >-
+        Host=postgres;Port=5432;Database=${POSTGRES_DB:-crediexpress};
+        Username=${POSTGRES_USER:-IN6AM};Password=${POSTGRES_PASSWORD:-In6amKnl!}
+      AppSettings__FrontendUrl: ${FRONTEND_URL:-http://localhost:5173}
+      JwtSettings__SecretKey: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JwtSettings__Issuer: ${JWT_ISSUER:-CrediExpress}
+      JwtSettings__Audience: ${JWT_AUDIENCE:-CrediExpress}
+      JwtSettings__ExpirationMinutes: ${JWT_EXPIRATION_MINUTES:-60}
+      SmtpSettings__Enabled: ${SMTP_ENABLED:-true}
+      SmtpSettings__Host: ${SMTP_HOST:-smtp.gmail.com}
+      SmtpSettings__Port: ${SMTP_PORT:-465}
+      SmtpSettings__EnableSsl: ${SMTP_ENABLE_SSL:-true}
+      SmtpSettings__Username: ${SMTP_USERNAME:-}
+      SmtpSettings__Password: ${SMTP_PASSWORD:-}
+      SmtpSettings__FromEmail: ${SMTP_FROM:-}
+      SmtpSettings__FromName: ${SMTP_FROM_NAME:-CrediExpress Soporte}
+      SmtpSettings__UseImplicitSsl: ${SMTP_USE_IMPLICIT_SSL:-true}
+      CloudinarySettings__CloudName: ${CLOUDINARY_CLOUD_NAME:-}
+      CloudinarySettings__ApiKey: ${CLOUDINARY_API_KEY:-}
+      CloudinarySettings__ApiSecret: ${CLOUDINARY_API_SECRET:-}
+      CloudinarySettings__BaseUrl: ${CLOUDINARY_BASE_URL:-}
+      CloudinarySettings__Folder: ${CLOUDINARY_FOLDER:-auth_crediexpress/profiles}
+      CloudinarySettings__DefaultAvatarPath: ${CLOUDINARY_DEFAULT_AVATAR_PATH:-avatarDefault.png}
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../login-service/log-service:/src
+      - /src/src/LogService.Api/bin
+      - /src/src/LogService.Api/obj
+      - /src/src/LogService.Application/bin
+      - /src/src/LogService.Application/obj
+      - /src/src/LogService.Domain/bin
+      - /src/src/LogService.Domain/obj
+      - /src/src/LogService.Persistence/bin
+      - /src/src/LogService.Persistence/obj
+    ports:
+      - "${LOG_SERVICE_PORT:-5062}:5062"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:5062/api/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - crediexpress_network
+
+  role-node:
+    build:
+      context: ../role-node
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.role-node
+    container_name: crediexpress_role_node
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressRoles?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../role-node:/app
+      - /app/node_modules
+    ports:
+      - "${ROLE_NODE_PORT:-3002}:3002"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3002/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  account-type-service:
+    build:
+      context: ../accountType-service
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.accountType-service
+    container_name: crediexpress_account_type_service
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressAccountTypes?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../accountType-service:/app
+      - /app/node_modules
+    ports:
+      - "${ACCOUNT_TYPE_SERVICE_PORT:-3003}:3003"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3003/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  account-service:
+    build:
+      context: ../account-service
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.account-service
+    container_name: crediexpress_account_service
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      account-type-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressAccounts?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../account-service:/app
+      - /app/node_modules
+    ports:
+      - "${ACCOUNT_SERVICE_PORT:-3004}:3004"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3004/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  bank-service:
+    build:
+      context: ../bank-service
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.bank-service
+    container_name: crediexpress_bank_service
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3006
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressBankAccounts?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../bank-service:/app
+      - /app/node_modules
+    ports:
+      - "${BANK_SERVICE_PORT:-3006}:3006"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3006/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  currency-conversion-service:
+    build:
+      context: ../currency-conversion-service
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.currency-conversion-service
+    container_name: crediexpress_currency_conversion_service
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3009
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressCurrencyConversion?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      EXCHANGE_RATE_API_KEY: ${EXCHANGE_RATE_API_KEY:-}
+      EXCHANGE_RATE_API_BASE_URL: ${EXCHANGE_RATE_API_BASE_URL:-https://v6.exchangerate-api.com/v6}
+      EXCHANGE_COMMISSION_PERCENT: ${EXCHANGE_COMMISSION_PERCENT:-1.5}
+      RATES_CACHE_TTL_MINUTES: ${RATES_CACHE_TTL_MINUTES:-30}
+      REQUEST_TIMEOUT_MS: ${REQUEST_TIMEOUT_MS:-8000}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../currency-conversion-service:/app
+      - /app/node_modules
+    ports:
+      - "${CURRENCY_CONVERSION_SERVICE_PORT:-3009}:3009"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3009/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  product-currency-service:
+    build:
+      context: ../product-currency-service
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.product-currency-service
+    container_name: crediexpress_product_currency_service
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      currency-conversion-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3008
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressProductsCurrencies?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      EXCHANGE_COMMISSION_PERCENT: ${EXCHANGE_COMMISSION_PERCENT:-1.5}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../product-currency-service:/app
+      - /app/node_modules
+    ports:
+      - "${PRODUCT_CURRENCY_SERVICE_PORT:-3008}:3008"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3008/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  core-banking-service:
+    build:
+      context: ../core-banking-service
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.core-banking-service
+    container_name: crediexpress_core_banking_service
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      bank-service:
+        condition: service_healthy
+      currency-conversion-service:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3007
+      URI_MONGODB: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-In6amKnl!}@mongodb:27017/CrediExpressCoreBanking?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt-secret-min-256-bits}
+      JWT_ISSUER: ${JWT_ISSUER:-CrediExpress}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-CrediExpress}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      CONVERSION_SERVICE_URL: http://currency-conversion-service:3009/crediExpress/v1
+      CONVERSION_TIMEOUT_MS: ${CONVERSION_TIMEOUT_MS:-8000}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../core-banking-service:/app
+      - /app/node_modules
+    ports:
+      - "${CORE_BANKING_SERVICE_PORT:-3007}:3007"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3007/crediExpress/v1/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - crediexpress_network
+
+  client-admin:
+    build:
+      context: ../client-admin
+      dockerfile: ../crediexpress-stack/dockerfiles/Dockerfile.client-admin
+    container_name: crediexpress_client_admin
+    restart: unless-stopped
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      log-service:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
+    environment:
+      VITE_AUTH_URL: ${VITE_AUTH_URL:-http://localhost:5062/api/v1}
+      VITE_ADMIN_URL: ${VITE_ADMIN_URL:-http://localhost:5222/api/v1}
+      VITE_ACCOUNT_TYPE_URL: ${VITE_ACCOUNT_TYPE_URL:-http://localhost:3003/crediExpress/v1}
+      VITE_BANK_URL: ${VITE_BANK_URL:-http://localhost:3006/crediExpress/v1}
+      VITE_CORE_BANKING_URL: ${VITE_CORE_BANKING_URL:-http://localhost:3007/crediExpress/v1}
+      VITE_CURRENCY_CONVERSION_URL: ${VITE_CURRENCY_CONVERSION_URL:-http://localhost:3009/crediExpress/v1}
+      CHOKIDAR_USEPOLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../client-admin:/app
+      - /app/node_modules
+    ports:
+      - "${CLIENT_ADMIN_PORT:-5173}:5173"
+    networks:
+      - crediexpress_network
+
+  client-user:
+    build:
+      context: ..
+      dockerfile: crediexpress-stack/dockerfiles/Dockerfile.client-user
+    container_name: crediexpress_client_user
+    restart: unless-stopped
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      log-service:
+        condition: service_healthy
+      account-service:
+        condition: service_healthy
+    environment:
+      EXPO_PUBLIC_AUTH_URL: ${EXPO_PUBLIC_AUTH_URL:-http://10.0.2.2:5222/api/v1/auth}
+      EXPO_PUBLIC_LOG_URL: ${EXPO_PUBLIC_LOG_URL:-http://10.0.2.2:5062/api/v1/log}
+      EXPO_PUBLIC_ACCOUNT_URL: ${EXPO_PUBLIC_ACCOUNT_URL:-http://10.0.2.2:3004/crediExpress/v1}
+      EXPO_PUBLIC_BANK_URL: ${EXPO_PUBLIC_BANK_URL:-http://10.0.2.2:3006/crediExpress/v1/bank}
+      EXPO_PUBLIC_ACCOUNT_TYPE_URL: ${EXPO_PUBLIC_ACCOUNT_TYPE_URL:-http://10.0.2.2:3003/crediExpress/v1/account-types}
+      EXPO_PUBLIC_CORE_BANKING_URL: ${EXPO_PUBLIC_CORE_BANKING_URL:-http://10.0.2.2:3007/crediExpress/v1/core-banking}
+      EXPO_PUBLIC_PRODUCT_CURRENCY_URL: ${EXPO_PUBLIC_PRODUCT_CURRENCY_URL:-http://10.0.2.2:3008/crediExpress/v1}
+      EXPO_PUBLIC_CONVERSION_URL: ${EXPO_PUBLIC_CONVERSION_URL:-http://10.0.2.2:3009/crediExpress/v1/conversions}
+      REACT_NATIVE_PACKAGER_HOSTNAME: ${EXPO_PACKAGER_HOSTNAME:-10.0.2.2}
+      EXPO_DEVTOOLS_LISTEN_ADDRESS: 0.0.0.0
+      EXPO_UNSTABLE_HEADLESS: "true"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+    env_file:
+      - path: .env.docker
+        required: false
+    volumes:
+      - ../client-user:/workspace/client-user
+      - /workspace/client-user/node_modules
+      - /workspace/node_modules
+    ports:
+      - "${CLIENT_USER_METRO_PORT:-8081}:8081"
+      - "${CLIENT_USER_EXPO_PORT:-19000}:19000"
+      - "${CLIENT_USER_EXPO_DEVTOOLS_PORT:-19001}:19001"
+      - "${CLIENT_USER_EXPO_INSPECTOR_PORT:-19002}:19002"
+    command: sh -c "cd /workspace && CI=true pnpm install --filter client-user... --ignore-scripts && cd client-user && pnpm exec expo start --host lan --port 8081"
+    networks:
+      - crediexpress_network
+
+networks:
+  crediexpress_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:

@@ -1,0 +1,16 @@
+# Secretos locales (nunca commitear)
+.env
+.env.*
+!.env.example
+!.env.docker.example
+.env.docker
+
+# Artefactos locales
+.DS_Store
+Thumbs.db
+
+# GitHub (instrucciones locales de Copilot/IDE)
+.github/
+
+# Cursor (configuracion local del IDE)
+.cursor/

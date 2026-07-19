@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+COPY AuthService.sln ./
+COPY src/AuthService.Domain/ src/AuthService.Domain/
+COPY src/AuthService.Persistence/ src/AuthService.Persistence/
+COPY src/AuthService.Application/ src/AuthService.Application/
+COPY src/AuthService.Api/ src/AuthService.Api/
+
+RUN dotnet restore AuthService.sln
+
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:5222
+
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+ENV DOTNET_WATCH_RESTART_ON_RUDE_EDIT=1
+
+EXPOSE 5222
+
+CMD ["dotnet", "watch", "--project", "src/AuthService.Api", "run", "--urls", "http://+:5222"]

@@ -1,0 +1,16 @@
+# Build context is the CrediExpress monorepo root (see docker-compose.yml),
+# not client-user/ alone: client-user has no lockfile of its own and is
+# installed as part of the pnpm workspace (root pnpm-lock.yaml).
+FROM node:22
+
+WORKDIR /workspace
+
+RUN corepack enable && corepack prepare pnpm@10 --activate
+
+COPY . .
+
+EXPOSE 8081 19000 19001 19002
+
+WORKDIR /workspace/client-user
+
+CMD ["pnpm", "exec", "expo", "start", "--host", "lan", "--port", "8081"]

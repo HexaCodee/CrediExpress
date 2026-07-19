@@ -1,0 +1,25 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+
+COPY LogService.sln ./
+COPY src/LogService.Domain/ src/LogService.Domain/
+COPY src/LogService.Persistence/ src/LogService.Persistence/
+COPY src/LogService.Application/ src/LogService.Application/
+COPY src/LogService.Api/ src/LogService.Api/
+
+RUN dotnet restore LogService.sln
+
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:5062
+
+ENV DOTNET_USE_POLLING_FILE_WATCHER=1
+ENV DOTNET_WATCH_RESTART_ON_RUDE_EDIT=1
+
+EXPOSE 5062
+
+CMD ["dotnet", "watch", "--project", "src/LogService.Api", "run", "--urls", "http://+:5062"]

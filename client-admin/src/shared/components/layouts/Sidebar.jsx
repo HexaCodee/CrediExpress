@@ -5,9 +5,9 @@ import HomeIcon from '../../../assets/img/Home.png';
 import TransactionIcon from '../../../assets/img/Transaction.png';
 import UserIcon from '../../../assets/img/User.png';
 import ChangeIcon from '../../../assets/img/Change.png';
-import AccountIcon from '../../../assets/img/Account.png';
+import AccountIcon from '../../../assets/img/account.png';
 import LogoutIcon from '../../../assets/img/Logout.png';
-import CrediExpressLogo from '../../../assets/img/crediExpressLogo.png';
+import CrediExpressLogo from '../../../assets/img/CrediExpressLogo.png';
 
 export const Sidebar = ({ user, onLogout }) => {
   const location = useLocation();

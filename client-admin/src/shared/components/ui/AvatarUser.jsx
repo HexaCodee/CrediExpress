@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../../../features/auth/store/authStore.js';
 import { normalizeUserModel } from '../../utils/user.js';
-import defaultAvatarImg from '../../../assets/img/avatarDefault-1749508519496.png';
+import defaultAvatarImg from '../../../assets/img/UserDefault.png';
 
 export const AvatarUser = () => {
   const { user: rawUser, logout } = useAuthStore();

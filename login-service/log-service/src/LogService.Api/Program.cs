@@ -55,12 +55,13 @@ builder.Services.AddSecurityPolicies(builder.Configuration);
 builder.Services.AddSecurityOptions();
 
 
-//Configure CORS 
+//Configure CORS
+var frontendUrl = builder.Configuration["AppSettings:FrontendUrl"] ?? "http://localhost:5173";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(frontendUrl, "http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

@@ -9,7 +9,8 @@ const allowedOrigins = [
 	'http://localhost:5062',
 	'http://localhost:3002',
 	'http://localhost:3003',
-];
+	process.env.FRONTEND_URL,
+].filter(Boolean);
 
 export const corsOptions = {
 	origin: (origin, callback) => {

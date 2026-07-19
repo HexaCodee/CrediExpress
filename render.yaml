@@ -163,6 +163,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
 
   - type: web
     name: account-type-service
@@ -186,6 +188,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
 
   - type: web
     name: account-service
@@ -209,6 +213,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
 
   - type: web
     name: bank-service
@@ -232,6 +238,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
 
   - type: web
     name: currency-conversion-service
@@ -255,6 +263,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
       - key: EXCHANGE_RATE_API_KEY
         sync: false
       - key: EXCHANGE_RATE_API_BASE_URL
@@ -288,6 +298,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
       - key: EXCHANGE_COMMISSION_PERCENT
         value: "1.5"
 
@@ -313,6 +325,8 @@ services:
         value: 1h
       - key: JWT_SECRET
         sync: false
+      - key: FRONTEND_URL
+        value: https://client-admin-g6ox.onrender.com
       - key: CONVERSION_SERVICE_URL
         sync: false
       - key: CONVERSION_TIMEOUT_MS

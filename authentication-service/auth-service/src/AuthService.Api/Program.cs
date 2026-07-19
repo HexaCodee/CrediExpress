@@ -6,6 +6,8 @@ using NetEscapades.AspNetCore.SecurityHeaders.Infrastructure;
 using Serilog;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +55,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Detras de un proxy TLS-terminating (Render, etc.) para que UseHttpsRedirection
+// no cause bucles de redireccion
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // use CORS policy ----
 app.UseCors("AllowFrontend");
@@ -142,8 +151,8 @@ using (var scope = app.Services.CreateScope())
     {
         logger.LogInformation("Verificando conexión a la base de datos...");
 
-        // Garantizar que la base de datos se crea (similar a Sequelize sync en Node.js)
-        await context.Database.EnsureCreatedAsync();
+        // Aplicar migraciones pendientes (crea la base/tablas si no existen)
+        await context.Database.MigrateAsync();
 
         logger.LogInformation("Base de datos lista. Ejecutando datos semilla...");
         await DataSeeder.SeedAsync(context);

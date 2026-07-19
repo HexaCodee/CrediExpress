@@ -1,0 +1,293 @@
+services:
+  # --- Servicios .NET ---
+
+  - type: web
+    name: auth-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.auth-service
+    dockerContext: authentication-service/auth-service
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PORT
+        value: 5222
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: AppSettings__FrontendUrl
+        sync: false
+      - key: AppSettings__AuthServiceUrl
+        sync: false
+      - key: JwtSettings__SecretKey
+        sync: false
+      - key: JwtSettings__Issuer
+        value: CrediExpress
+      - key: JwtSettings__Audience
+        value: CrediExpress
+      - key: JwtSettings__ExpirationMinutes
+        value: "60"
+      - key: SmtpSettings__Enabled
+        value: "true"
+      - key: SmtpSettings__Host
+        value: smtp.gmail.com
+      - key: SmtpSettings__Port
+        value: "465"
+      - key: SmtpSettings__EnableSsl
+        value: "true"
+      - key: SmtpSettings__UseImplicitSsl
+        value: "true"
+      - key: SmtpSettings__Username
+        sync: false
+      - key: SmtpSettings__Password
+        sync: false
+      - key: SmtpSettings__FromEmail
+        sync: false
+      - key: SmtpSettings__FromName
+        value: CrediExpress Soporte
+      - key: CloudinarySettings__CloudName
+        sync: false
+      - key: CloudinarySettings__ApiKey
+        sync: false
+      - key: CloudinarySettings__ApiSecret
+        sync: false
+      - key: CloudinarySettings__BaseUrl
+        sync: false
+      - key: CloudinarySettings__Folder
+        value: auth_crediexpress/profiles
+      - key: CloudinarySettings__DefaultAvatarPath
+        value: avatarDefault.png
+
+  - type: web
+    name: log-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.log-service
+    dockerContext: login-service/log-service
+    plan: free
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: PORT
+        value: 5062
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: AppSettings__FrontendUrl
+        sync: false
+      - key: JwtSettings__SecretKey
+        sync: false
+      - key: JwtSettings__Issuer
+        value: CrediExpress
+      - key: JwtSettings__Audience
+        value: CrediExpress
+      - key: JwtSettings__ExpirationMinutes
+        value: "60"
+      - key: SmtpSettings__Enabled
+        value: "true"
+      - key: SmtpSettings__Host
+        value: smtp.gmail.com
+      - key: SmtpSettings__Port
+        value: "465"
+      - key: SmtpSettings__EnableSsl
+        value: "true"
+      - key: SmtpSettings__UseImplicitSsl
+        value: "true"
+      - key: SmtpSettings__Username
+        sync: false
+      - key: SmtpSettings__Password
+        sync: false
+      - key: SmtpSettings__FromEmail
+        sync: false
+      - key: SmtpSettings__FromName
+        value: CrediExpress Soporte
+      - key: CloudinarySettings__CloudName
+        sync: false
+      - key: CloudinarySettings__ApiKey
+        sync: false
+      - key: CloudinarySettings__ApiSecret
+        sync: false
+      - key: CloudinarySettings__BaseUrl
+        sync: false
+      - key: CloudinarySettings__Folder
+        value: auth_crediexpress/profiles
+      - key: CloudinarySettings__DefaultAvatarPath
+        value: avatarDefault.png
+
+  # --- Microservicios Node ---
+
+  - type: web
+    name: role-node
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.role-node
+    dockerContext: role-node
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3002"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+
+  - type: web
+    name: account-type-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.account-type-service
+    dockerContext: accountType-service
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3003"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+
+  - type: web
+    name: account-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.account-service
+    dockerContext: account-service
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3004"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+
+  - type: web
+    name: bank-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.bank-service
+    dockerContext: bank-service
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3006"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+
+  - type: web
+    name: currency-conversion-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.currency-conversion-service
+    dockerContext: currency-conversion-service
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3009"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+      - key: EXCHANGE_RATE_API_KEY
+        sync: false
+      - key: EXCHANGE_RATE_API_BASE_URL
+        value: https://v6.exchangerate-api.com/v6
+      - key: EXCHANGE_COMMISSION_PERCENT
+        value: "1.5"
+      - key: RATES_CACHE_TTL_MINUTES
+        value: "30"
+      - key: REQUEST_TIMEOUT_MS
+        value: "8000"
+
+  - type: web
+    name: product-currency-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.product-currency-service
+    dockerContext: product-currency-service
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3008"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+      - key: EXCHANGE_COMMISSION_PERCENT
+        value: "1.5"
+
+  - type: web
+    name: core-banking-service
+    runtime: docker
+    dockerfilePath: crediexpress-stack/dockerfiles/render/Dockerfile.core-banking-service
+    dockerContext: core-banking-service
+    plan: free
+    healthCheckPath: /crediExpress/v1/health
+    envVars:
+      - key: PORT
+        value: "3007"
+      - key: NODE_ENV
+        value: production
+      - key: URI_MONGODB
+        sync: false
+      - key: JWT_ISSUER
+        value: CrediExpress
+      - key: JWT_AUDIENCE
+        value: CrediExpress
+      - key: JWT_EXPIRES_IN
+        value: 1h
+      - key: JWT_SECRET
+        sync: false
+      - key: CONVERSION_SERVICE_URL
+        sync: false
+      - key: CONVERSION_TIMEOUT_MS
+        value: "8000"

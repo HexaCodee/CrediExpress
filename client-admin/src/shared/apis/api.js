@@ -4,7 +4,7 @@ import { normalizeUserModel } from '../utils/user.js';
 
 const axiosAuth = axios.create({
   baseURL: import.meta.env.VITE_AUTH_URL,
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,7 +12,7 @@ const axiosAuth = axios.create({
 
 const axiosAdmin = axios.create({
   baseURL: import.meta.env.VITE_ADMIN_URL,
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,7 +20,7 @@ const axiosAdmin = axios.create({
 
 const axiosConversion = axios.create({
   baseURL: import.meta.env.VITE_CURRENCY_CONVERSION_URL,
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,7 +28,7 @@ const axiosConversion = axios.create({
 
 const axiosBank = axios.create({
   baseURL: import.meta.env.VITE_BANK_URL,
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -36,7 +36,7 @@ const axiosBank = axios.create({
 
 const axiosCoreBanking = axios.create({
   baseURL: import.meta.env.VITE_CORE_BANKING_URL,
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,7 +44,7 @@ const axiosCoreBanking = axios.create({
 
 const axiosAccountType = axios.create({
   baseURL: import.meta.env.VITE_ACCOUNT_TYPE_URL,
-  timeout: 5000,
+  timeout: 50000,
   headers: {
     'Content-Type': 'application/json',
   },
